@@ -57,13 +57,8 @@ class LG_URL_Rewriter {
         // Detect language early
         add_action('init', array($this, 'detect_language'), 5);
 
-        // Filter URLs to add language prefix
-        add_filter('home_url', array($this, 'filter_url'), 10, 2);
-        add_filter('post_link', array($this, 'filter_url'), 10, 2);
-        add_filter('page_link', array($this, 'filter_url'), 10, 2);
-        add_filter('category_link', array($this, 'filter_url'), 10, 2);
-        add_filter('tag_link', array($this, 'filter_url'), 10, 2);
-        add_filter('term_link', array($this, 'filter_url'), 10, 2);
+        // Don't filter URLs - causes redirect loops
+        // Language switching will be handled by frontend JavaScript and widgets
 
         // Handle old ?lang= parameter redirects
         add_action('template_redirect', array($this, 'handle_legacy_redirect'));
