@@ -232,45 +232,54 @@ class LG_Content_Translator {
         error_log('[LG AI Translator] Starting HTML translation for language: ' . $target_lang);
         error_log('[LG AI Translator] HTML length: ' . strlen($html) . ' bytes');
 
-        // Extract all text nodes - but skip script and style tags during extraction
-        $pattern = '/>([^<>]+)</';
+        // Remove script and style tags completely before processing
+        $html_without_scripts = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '<!--SCRIPT_REMOVED-->', $html);
+        $html_without_scripts = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '<!--STYLE_REMOVED-->', $html_without_scripts);
+
+        error_log('[LG AI Translator] Cleaned HTML length: ' . strlen($html_without_scripts) . ' bytes');
+
+        // Extract text nodes only from visible content
+        // Pattern: text between tags that contains actual letters
+        $pattern = '/>([^<]+)</';
         $text_nodes = array();
         $placeholders = array();
 
-        preg_match_all($pattern, $html, $matches, PREG_OFFSET_CAPTURE);
+        preg_match_all($pattern, $html_without_scripts, $matches);
 
         error_log('[LG AI Translator] Found ' . count($matches[1]) . ' potential text nodes');
 
         $extracted_count = 0;
-        foreach ($matches[1] as $index => $match) {
-            $text = $match[0];
-            $offset = $match[1];
+        foreach ($matches[1] as $text) {
+            $trimmed = trim($text);
 
-            // Check if this text is inside a <script> or <style> tag
-            $before_text = substr($html, 0, $offset);
-            $script_open_count = preg_match_all('/<script[^>]*>/i', $before_text);
-            $script_close_count = preg_match_all('/<\/script>/i', $before_text);
-            $style_open_count = preg_match_all('/<style[^>]*>/i', $before_text);
-            $style_close_count = preg_match_all('/<\/style>/i', $before_text);
-
-            // If inside script or style tag, skip
-            if ($script_open_count > $script_close_count || $style_open_count > $style_close_count) {
+            // Skip empty or whitespace-only
+            if ($trimmed === '') {
                 continue;
             }
 
-            // Skip if text is only whitespace, numbers, or special characters
-            if (trim($text) === '' || !preg_match('/\p{L}/u', $text)) {
+            // Skip if no letters (numbers, symbols only)
+            if (!preg_match('/\p{L}/u', $trimmed)) {
                 continue;
             }
 
-            // Skip very short text (likely not meaningful)
-            if (mb_strlen(trim($text)) < 3) {
+            // Skip very short text (likely noise)
+            if (mb_strlen($trimmed) < 2) {
+                continue;
+            }
+
+            // Skip URLs and emails
+            if (preg_match('/^https?:\/\//i', $trimmed) || filter_var($trimmed, FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+
+            // Skip CSS-like content
+            if (preg_match('/^[\{\}:;]|display:|margin:|padding:|color:/i', $trimmed)) {
                 continue;
             }
 
             $extracted_count++;
             if ($extracted_count <= 5) {
-                error_log('[LG AI Translator] Sample text ' . $extracted_count . ': ' . substr($text, 0, 100));
+                error_log('[LG AI Translator] Sample text ' . $extracted_count . ': ' . substr($trimmed, 0, 80));
             }
 
             // Check individual text cache
@@ -304,7 +313,7 @@ class LG_Content_Translator {
             }
         }
 
-        // Replace all text nodes with translations
+        // Replace all text nodes with translations in the ORIGINAL HTML (not cleaned)
         if (!empty($placeholders)) {
             error_log('[LG AI Translator] Replacing ' . count($placeholders) . ' text nodes with translations');
             foreach ($placeholders as $original => $translated) {
