@@ -1,0 +1,25 @@
+.lg-aitrans-tabs {
+    margin-top: 20px;
+}
+
+.tab-content {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-top: 0;
+    padding: 20px;
+}
+
+#gemini-key-status,
+#openai-key-status,
+#cache-status {
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.form-table th {
+    width: 200px;
+}
+
+.small-text {
+    width: 100px;
+}
