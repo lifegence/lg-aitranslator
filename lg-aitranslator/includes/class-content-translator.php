@@ -63,6 +63,9 @@ class LG_Content_Translator {
             return;
         }
 
+        // HTML output buffering for full page translation
+        add_action('template_redirect', array($this, 'start_output_buffer'), 1);
+
         // Content filters - use high priority to run after other plugins
         add_filter('the_title', array($this, 'translate_title'), 999, 2);
         add_filter('the_content', array($this, 'translate_content'), 999);
@@ -82,6 +85,96 @@ class LG_Content_Translator {
         // SEO hooks
         add_action('wp_head', array($this, 'output_hreflang_tags'));
         add_filter('language_attributes', array($this, 'filter_language_attributes'));
+    }
+
+    /**
+     * Start output buffering for full page translation
+     */
+    public function start_output_buffer() {
+        // Skip for admin pages
+        if (is_admin()) {
+            return;
+        }
+
+        // Get current language
+        $current_lang = $this->url_rewriter->get_current_language();
+        $default_lang = $this->url_rewriter->get_default_language();
+
+        // Only buffer if not default language
+        if ($current_lang !== $default_lang) {
+            ob_start(array($this, 'translate_html_output'));
+        }
+    }
+
+    /**
+     * Translate entire HTML output
+     */
+    public function translate_html_output($html) {
+        // Skip empty output
+        if (empty($html)) {
+            return $html;
+        }
+
+        // Get current language
+        $current_lang = $this->url_rewriter->get_current_language();
+        $default_lang = $this->url_rewriter->get_default_language();
+
+        // Skip if default language
+        if ($current_lang === $default_lang) {
+            return $html;
+        }
+
+        // Generate cache key for entire page
+        $cache_key = 'page_' . md5($html) . '_' . $current_lang;
+
+        // Check cache
+        $cached = $this->cache->get($cache_key);
+        if ($cached !== false) {
+            return $cached;
+        }
+
+        // Translate text nodes in HTML
+        $translated_html = $this->translate_html_text_nodes($html, $current_lang);
+
+        // Cache result
+        $this->cache->set($cache_key, $translated_html);
+
+        return $translated_html;
+    }
+
+    /**
+     * Translate text nodes in HTML while preserving structure
+     */
+    private function translate_html_text_nodes($html, $target_lang) {
+        // Don't translate if HTML is too small (likely API response)
+        if (strlen($html) < 100) {
+            return $html;
+        }
+
+        // Extract and translate text content from HTML
+        // This is a simplified approach - extract visible text
+        $pattern = '/>([^<>]+)</';
+
+        $translated = preg_replace_callback($pattern, function($matches) use ($target_lang) {
+            $text = $matches[1];
+
+            // Skip if text is only whitespace, numbers, or special characters
+            if (trim($text) === '' || !preg_match('/\p{L}/u', $text)) {
+                return $matches[0];
+            }
+
+            // Skip very short text (likely not meaningful)
+            if (mb_strlen(trim($text)) < 3) {
+                return $matches[0];
+            }
+
+            // Translate the text
+            $translated_text = $this->translate_text($text, $target_lang);
+
+            return '>' . $translated_text . '<';
+        }, $html);
+
+        return $translated;
     }
 
     /**
@@ -345,9 +438,23 @@ class LG_Content_Translator {
      * Translate plain text
      */
     private function translate_text($text, $target_lang) {
+        // Generate cache key
+        $cache_key = 'text_' . md5($text) . '_' . $target_lang;
+
+        // Check cache
+        $cached = $this->cache->get($cache_key);
+        if ($cached !== false) {
+            return $cached;
+        }
+
         try {
             $default_lang = $this->url_rewriter->get_default_language();
-            return $this->translation_service->translate_text($text, $default_lang, $target_lang);
+            $translated = $this->translation_service->translate_text($text, $default_lang, $target_lang);
+
+            // Cache result
+            $this->cache->set($cache_key, $translated);
+
+            return $translated;
         } catch (Exception $e) {
             error_log('[LG AI Translator] Translation failed: ' . $e->getMessage());
             return $text; // Return original on error
