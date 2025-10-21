@@ -5,7 +5,6 @@
  * Description: AI-powered multilingual translation plugin using Gemini and OpenAI for WordPress websites.
  * Version: 1.0.0
  * Author: Lifegence Corporation
- * Author URI: https://lifegence.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: lg-aitranslator
