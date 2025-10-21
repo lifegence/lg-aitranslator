@@ -60,8 +60,8 @@ class LG_URL_Rewriter {
         // Don't filter URLs - causes redirect loops
         // Language switching will be handled by frontend JavaScript and widgets
 
-        // Handle old ?lang= parameter redirects
-        add_action('template_redirect', array($this, 'handle_legacy_redirect'));
+        // Don't handle legacy redirects - .htaccess already adds ?lang= parameter
+        // which would cause infinite redirect loop
     }
 
     /**
