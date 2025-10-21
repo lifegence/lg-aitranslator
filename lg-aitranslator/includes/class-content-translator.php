@@ -85,6 +85,16 @@ class LG_Content_Translator {
         // SEO hooks
         add_action('wp_head', array($this, 'output_hreflang_tags'));
         add_filter('language_attributes', array($this, 'filter_language_attributes'));
+
+        // Admin bar menu for edit mode
+        add_action('admin_bar_menu', array($this, 'add_admin_bar_menu'), 100);
+    }
+
+    /**
+     * Check if translation edit mode is enabled
+     */
+    private function is_edit_mode() {
+        return isset($_GET['lg_aitrans_edit']) && $_GET['lg_aitrans_edit'] === '1' && current_user_can('manage_options');
     }
 
     /**
@@ -316,8 +326,22 @@ class LG_Content_Translator {
         // Replace all text nodes with translations in the ORIGINAL HTML (not cleaned)
         if (!empty($placeholders)) {
             error_log('[LG AI Translator] Replacing ' . count($placeholders) . ' text nodes with translations');
+
+            $edit_mode = $this->is_edit_mode();
+            $text_index = 0;
+
             foreach ($placeholders as $original => $translated) {
-                $html = str_replace('>' . $original . '<', '>' . $translated . '<', $html);
+                if ($edit_mode) {
+                    // Add edit button in edit mode
+                    $cache_key = 'text_' . md5($original) . '_' . $target_lang;
+                    $edit_html = '<span class="lg-aitrans-editable" data-original="' . esc_attr($original) . '" data-cache-key="' . esc_attr($cache_key) . '" data-lang="' . esc_attr($target_lang) . '">'
+                               . $translated
+                               . '<button class="lg-aitrans-edit-btn" data-index="' . $text_index . '">✏️</button></span>';
+                    $html = str_replace('>' . $original . '<', '>' . $edit_html . '<', $html);
+                    $text_index++;
+                } else {
+                    $html = str_replace('>' . $original . '<', '>' . $translated . '<', $html);
+                }
             }
         }
 
@@ -737,5 +761,50 @@ class LG_Content_Translator {
         $locale = $locale_map[$current_lang] ?? $current_lang;
 
         return str_replace('lang="en-US"', 'lang="' . esc_attr($current_lang) . '"', $output);
+    }
+
+    /**
+     * Add admin bar menu for translation edit mode
+     */
+    public function add_admin_bar_menu($wp_admin_bar) {
+        // Only show for admins on frontend pages
+        if (!current_user_can('manage_options') || is_admin()) {
+            return;
+        }
+
+        // Get current language
+        $current_lang = $this->url_rewriter->get_current_language();
+        $default_lang = $this->url_rewriter->get_default_language();
+
+        // Only show on translated pages
+        if ($current_lang === $default_lang) {
+            return;
+        }
+
+        // Check if edit mode is active
+        $is_edit_mode = $this->is_edit_mode();
+
+        // Build toggle URL
+        $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+        if ($is_edit_mode) {
+            // Remove edit parameter
+            $toggle_url = remove_query_arg('lg_aitrans_edit', $current_url);
+            $title = '✏️ 編集モード: ON';
+        } else {
+            // Add edit parameter
+            $toggle_url = add_query_arg('lg_aitrans_edit', '1', $current_url);
+            $title = '✏️ 翻訳を編集';
+        }
+
+        $wp_admin_bar->add_node(array(
+            'id'    => 'lg-aitranslator-edit',
+            'title' => $title,
+            'href'  => $toggle_url,
+            'meta'  => array(
+                'class' => 'lg-aitranslator-edit-toggle',
+                'title' => $is_edit_mode ? __('Exit translation edit mode', 'lg-aitranslator') : __('Edit translations on this page', 'lg-aitranslator')
+            )
+        ));
     }
 }

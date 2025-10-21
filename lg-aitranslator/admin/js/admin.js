@@ -111,6 +111,34 @@ jQuery(document).ready(function($) {
         });
     });
 
+    // Increment cache version
+    $('#increment-cache-version').on('click', function() {
+        if (!confirm('This will invalidate all existing translations and force re-translation. Continue?')) {
+            return;
+        }
+
+        var $btn = $(this);
+        var $status = $('#cache-status');
+
+        $btn.prop('disabled', true).text('Incrementing...');
+
+        $.post(lgAITranslator.ajaxurl, {
+            action: 'lg_aitrans_increment_cache_version',
+            nonce: lgAITranslator.nonce
+        }, function(response) {
+            $btn.prop('disabled', false).text('Increment Cache Version (Force Re-translate)');
+
+            if (response.success) {
+                $status.html('<span style="color:green;">✓ ' + response.data.message + '</span>');
+                setTimeout(function() {
+                    location.reload();
+                }, 1500);
+            } else {
+                $status.html('<span style="color:red;">✗ ' + response.data.error + '</span>');
+            }
+        });
+    });
+
     // Clear cache
     $('#clear-cache').on('click', function() {
         if (!confirm('Are you sure you want to clear all translation cache?')) {

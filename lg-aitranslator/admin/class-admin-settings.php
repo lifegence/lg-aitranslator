@@ -382,7 +382,19 @@ class LG_AITranslator_Admin_Settings {
                 <td>
                     <p><strong><?php esc_html_e('Total Cached Items:', 'lg-aitranslator'); ?></strong> <?php echo esc_html($stats['total_keys']); ?></p>
                     <p><strong><?php esc_html_e('Total Size:', 'lg-aitranslator'); ?></strong> <?php echo esc_html(size_format($stats['total_size'])); ?></p>
-                    <button type="button" id="clear-cache" class="button"><?php esc_html_e('Clear All Cache', 'lg-aitranslator'); ?></button>
+                    <?php
+                    $cache_version = get_option('lg_aitranslator_cache_version', 1);
+                    ?>
+                    <p><strong><?php esc_html_e('Cache Version:', 'lg-aitranslator'); ?></strong> <?php echo esc_html($cache_version); ?></p>
+                    <p class="description">
+                        <?php esc_html_e('Incrementing the cache version will invalidate all existing translations and force re-translation on next page load.', 'lg-aitranslator'); ?>
+                    </p>
+                    <button type="button" id="increment-cache-version" class="button button-secondary" style="margin-right: 10px;">
+                        <?php esc_html_e('Increment Cache Version (Force Re-translate)', 'lg-aitranslator'); ?>
+                    </button>
+                    <button type="button" id="clear-cache" class="button">
+                        <?php esc_html_e('Clear All Cache', 'lg-aitranslator'); ?>
+                    </button>
                     <div id="cache-status"></div>
                 </td>
             </tr>
