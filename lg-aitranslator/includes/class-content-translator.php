@@ -232,12 +232,18 @@ class LG_Content_Translator {
         error_log('[LG AI Translator] Starting HTML translation for language: ' . $target_lang);
         error_log('[LG AI Translator] HTML length: ' . strlen($html) . ' bytes');
 
+        // Remove script and style tags before translation
+        $html_clean = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $html);
+        $html_clean = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $html_clean);
+
+        error_log('[LG AI Translator] Cleaned HTML length: ' . strlen($html_clean) . ' bytes (removed scripts/styles)');
+
         // Extract all text nodes first
         $pattern = '/>([^<>]+)</';
         $text_nodes = array();
         $placeholders = array();
 
-        preg_match_all($pattern, $html, $matches, PREG_OFFSET_CAPTURE);
+        preg_match_all($pattern, $html_clean, $matches, PREG_OFFSET_CAPTURE);
 
         error_log('[LG AI Translator] Found ' . count($matches[1]) . ' potential text nodes');
 
