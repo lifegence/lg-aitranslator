@@ -80,7 +80,8 @@ class LG_URL_Rewriter {
 
             // Validate language
             if (in_array($detected_lang, $this->supported_languages)) {
-                // Store detected language
+                // Store detected language globally so other instances can access it
+                $GLOBALS['lg_aitranslator_current_lang'] = $detected_lang;
                 $this->current_language = $detected_lang;
 
                 // Remove language prefix from REQUEST_URI
@@ -116,7 +117,13 @@ class LG_URL_Rewriter {
             return $this->current_language;
         }
 
-        // Check URL query var
+        // Check global variable set by process_language_prefix()
+        if (isset($GLOBALS['lg_aitranslator_current_lang'])) {
+            $this->current_language = $GLOBALS['lg_aitranslator_current_lang'];
+            return $this->current_language;
+        }
+
+        // Check URL query var (set by .htaccess rewrite)
         $lang = get_query_var('lang');
 
         if (!empty($lang) && in_array($lang, $this->supported_languages)) {
