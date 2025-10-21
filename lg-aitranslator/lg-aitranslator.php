@@ -81,6 +81,9 @@ class LG_AITranslator {
      * Load plugin dependencies
      */
     private function load_dependencies() {
+        // Error handler (load first)
+        require_once LG_AITRANS_PLUGIN_DIR . 'includes/class-error-handler.php';
+
         // Core classes
         require_once LG_AITRANS_PLUGIN_DIR . 'includes/class-translation-service-interface.php';
         require_once LG_AITRANS_PLUGIN_DIR . 'includes/class-translation-service-factory.php';
@@ -120,6 +123,7 @@ class LG_AITranslator {
         // Admin hooks
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+        add_action('admin_notices', array('LG_Error_Handler', 'display_admin_notices'));
 
         // Frontend hooks
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
@@ -341,14 +345,52 @@ class LG_AITranslator {
         register_rest_route('lg-aitranslator/v1', '/translate', array(
             'methods' => 'POST',
             'callback' => array($this, 'rest_translate'),
-            'permission_callback' => '__return_true'
+            'permission_callback' => array($this, 'check_api_permission'),
+            'args' => array(
+                'text' => array(
+                    'required' => true,
+                    'type' => 'string',
+                    'sanitize_callback' => 'sanitize_text_field'
+                ),
+                'target_lang' => array(
+                    'required' => true,
+                    'type' => 'string',
+                    'sanitize_callback' => 'sanitize_text_field'
+                ),
+                'source_lang' => array(
+                    'type' => 'string',
+                    'sanitize_callback' => 'sanitize_text_field'
+                )
+            )
         ));
 
         register_rest_route('lg-aitranslator/v1', '/languages', array(
             'methods' => 'GET',
             'callback' => array($this, 'rest_get_languages'),
-            'permission_callback' => '__return_true'
+            'permission_callback' => '__return_true' // Public endpoint
         ));
+    }
+
+    /**
+     * Check REST API permission
+     */
+    public function check_api_permission($request) {
+        // Allow logged-in users or verify nonce for public access
+        if (is_user_logged_in()) {
+            return true;
+        }
+
+        // Verify nonce for public API access
+        $nonce = $request->get_header('X-WP-Nonce');
+        if ($nonce && wp_verify_nonce($nonce, 'wp_rest')) {
+            return true;
+        }
+
+        return new WP_Error(
+            'rest_forbidden',
+            __('You do not have permission to access this endpoint.', 'lg-aitranslator'),
+            array('status' => 403)
+        );
     }
 
     /**

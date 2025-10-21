@@ -16,6 +16,21 @@ if (!defined('ABSPATH')) {
 class LG_Content_Translator {
 
     /**
+     * Minimum translatable text length
+     */
+    const MIN_TEXT_LENGTH = 2;
+
+    /**
+     * Minimum HTML length to process
+     */
+    const MIN_HTML_LENGTH = 100;
+
+    /**
+     * Maximum sample texts to log
+     */
+    const MAX_LOG_SAMPLES = 5;
+
+    /**
      * URL Rewriter instance
      */
     private $url_rewriter;
@@ -110,10 +125,12 @@ class LG_Content_Translator {
         $current_lang = $this->url_rewriter->get_current_language();
 
         // Debug: Log language detection
-        error_log('LG_Content_Translator::start_output_buffer - Current lang: ' . $current_lang);
-        error_log('LG_Content_Translator::start_output_buffer - Global var: ' . (isset($GLOBALS['lg_aitranslator_current_lang']) ? $GLOBALS['lg_aitranslator_current_lang'] : 'NOT SET'));
-        error_log('LG_Content_Translator::start_output_buffer - REQUEST_URI: ' . $_SERVER['REQUEST_URI']);
-        error_log('LG_Content_Translator::start_output_buffer - Query var lang: ' . get_query_var('lang'));
+        LG_Error_Handler::debug('Output buffer started', array(
+            'current_lang' => $current_lang,
+            'global_var' => isset($GLOBALS['lg_aitranslator_current_lang']) ? $GLOBALS['lg_aitranslator_current_lang'] : 'NOT SET',
+            'request_uri' => $_SERVER['REQUEST_URI'],
+            'query_var_lang' => get_query_var('lang')
+        ));
         $default_lang = $this->url_rewriter->get_default_language();
 
         // Only buffer if not default language
@@ -235,18 +252,22 @@ class LG_Content_Translator {
      */
     private function translate_html_text_nodes($html, $target_lang) {
         // Don't translate if HTML is too small (likely API response)
-        if (strlen($html) < 100) {
+        if (strlen($html) < self::MIN_HTML_LENGTH) {
             return $html;
         }
 
-        error_log('[LG AI Translator] Starting HTML translation for language: ' . $target_lang);
-        error_log('[LG AI Translator] HTML length: ' . strlen($html) . ' bytes');
+        LG_Error_Handler::debug('Starting HTML translation', array(
+            'target_lang' => $target_lang,
+            'html_length' => strlen($html)
+        ));
 
         // Remove script and style tags completely before processing
         $html_without_scripts = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '<!--SCRIPT_REMOVED-->', $html);
         $html_without_scripts = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '<!--STYLE_REMOVED-->', $html_without_scripts);
 
-        error_log('[LG AI Translator] Cleaned HTML length: ' . strlen($html_without_scripts) . ' bytes');
+        LG_Error_Handler::debug('HTML cleaned', array(
+            'cleaned_length' => strlen($html_without_scripts)
+        ));
 
         // Extract text nodes only from visible content
         // Pattern: text between tags that contains actual letters
@@ -256,9 +277,13 @@ class LG_Content_Translator {
 
         preg_match_all($pattern, $html_without_scripts, $matches);
 
-        error_log('[LG AI Translator] Found ' . count($matches[1]) . ' potential text nodes');
+        LG_Error_Handler::debug('Text nodes found', array(
+            'potential_nodes' => count($matches[1])
+        ));
 
         $extracted_count = 0;
+        $samples = array();
+
         foreach ($matches[1] as $text) {
             $trimmed = trim($text);
 
@@ -273,7 +298,7 @@ class LG_Content_Translator {
             }
 
             // Skip very short text (likely noise)
-            if (mb_strlen($trimmed) < 2) {
+            if (mb_strlen($trimmed) < self::MIN_TEXT_LENGTH) {
                 continue;
             }
 
@@ -288,8 +313,8 @@ class LG_Content_Translator {
             }
 
             $extracted_count++;
-            if ($extracted_count <= 5) {
-                error_log('[LG AI Translator] Sample text ' . $extracted_count . ': ' . substr($trimmed, 0, 80));
+            if ($extracted_count <= self::MAX_LOG_SAMPLES) {
+                $samples[] = substr($trimmed, 0, 80);
             }
 
             // Check individual text cache
@@ -305,13 +330,23 @@ class LG_Content_Translator {
             }
         }
 
-        error_log('[LG AI Translator] Extracted ' . $extracted_count . ' text nodes, ' . count($text_nodes) . ' need translation');
+        LG_Error_Handler::debug('Text extraction completed', array(
+            'extracted_count' => $extracted_count,
+            'need_translation' => count($text_nodes),
+            'samples' => $samples
+        ));
 
         // Batch translate all uncached text nodes
         if (!empty($text_nodes)) {
-            error_log('[LG AI Translator] Starting batch translation of ' . count($text_nodes) . ' texts');
+            LG_Error_Handler::debug('Starting batch translation', array(
+                'text_count' => count($text_nodes)
+            ));
+
             $batch_translations = $this->batch_translate_texts($text_nodes, $target_lang);
-            error_log('[LG AI Translator] Batch translation completed, got ' . count($batch_translations) . ' results');
+
+            LG_Error_Handler::debug('Batch translation completed', array(
+                'results_count' => count($batch_translations)
+            ));
 
             // Cache and merge results
             foreach ($batch_translations as $original => $translated) {
@@ -325,7 +360,9 @@ class LG_Content_Translator {
 
         // Replace all text nodes with translations in the ORIGINAL HTML (not cleaned)
         if (!empty($placeholders)) {
-            error_log('[LG AI Translator] Replacing ' . count($placeholders) . ' text nodes with translations');
+            LG_Error_Handler::debug('Replacing text nodes with translations', array(
+                'placeholder_count' => count($placeholders)
+            ));
 
             $edit_mode = $this->is_edit_mode();
             $text_index = 0;
@@ -345,7 +382,7 @@ class LG_Content_Translator {
             }
         }
 
-        error_log('[LG AI Translator] HTML translation completed');
+        LG_Error_Handler::debug('HTML translation completed');
         return $html;
     }
 
@@ -359,11 +396,15 @@ class LG_Content_Translator {
 
         // Translate ALL texts in a SINGLE API call to avoid rate limits
         // This uses only 1 API request per page instead of multiple
-        error_log('[LG AI Translator] Batch translating ' . count($texts) . ' texts in single API call');
+        LG_Error_Handler::debug('Batch translating texts in single API call', array(
+            'text_count' => count($texts)
+        ));
 
         $results = $this->batch_translate_chunk($texts, $target_lang);
 
-        error_log('[LG AI Translator] Batch translation returned ' . count($results) . ' results');
+        LG_Error_Handler::debug('Batch translation returned results', array(
+            'results_count' => count($results)
+        ));
 
         return $results;
     }
@@ -395,7 +436,7 @@ class LG_Content_Translator {
 
             return $results;
         } catch (Exception $e) {
-            error_log('[LG AI Translator] Batch translation failed: ' . $e->getMessage());
+            LG_Error_Handler::handle_exception($e, 'Batch translation failed');
 
             // Return originals on error
             $results = array();
@@ -685,7 +726,7 @@ class LG_Content_Translator {
 
             return $translated;
         } catch (Exception $e) {
-            error_log('[LG AI Translator] Translation failed: ' . $e->getMessage());
+            LG_Error_Handler::handle_exception($e, 'Translation failed');
             return $text; // Return original on error
         }
     }
@@ -698,7 +739,7 @@ class LG_Content_Translator {
             $default_lang = $this->url_rewriter->get_default_language();
             return $this->translation_service->translate_html($html, $default_lang, $target_lang);
         } catch (Exception $e) {
-            error_log('[LG AI Translator] HTML translation failed: ' . $e->getMessage());
+            LG_Error_Handler::handle_exception($e, 'HTML translation failed');
             return $html; // Return original on error
         }
     }

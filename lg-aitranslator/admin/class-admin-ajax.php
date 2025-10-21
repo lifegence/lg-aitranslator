@@ -130,21 +130,40 @@ class LG_AITranslator_Admin_AJAX {
      * Update translation cache (for inline editing)
      */
     public function update_translation() {
-        check_ajax_referer('lg_aitranslator_frontend', 'nonce');
-
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('error' => __('Unauthorized', 'lg-aitranslator')));
+        // Verify nonce
+        if (!check_ajax_referer('lg_aitranslator_frontend', 'nonce', false)) {
+            wp_send_json_error(array(
+                'error' => __('Security check failed. Please refresh the page and try again.', 'lg-aitranslator')
+            ), 403);
+            return;
         }
 
-        $cache_key = sanitize_text_field($_POST['cache_key'] ?? '');
-        $translation = wp_kses_post($_POST['translation'] ?? '');
+        // Verify user permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array(
+                'error' => __('You do not have permission to edit translations.', 'lg-aitranslator')
+            ), 403);
+            return;
+        }
+
+        // Validate and sanitize inputs
+        $cache_key = isset($_POST['cache_key']) ? sanitize_text_field($_POST['cache_key']) : '';
+        $translation = isset($_POST['translation']) ? wp_kses_post($_POST['translation']) : '';
 
         if (empty($cache_key)) {
-            wp_send_json_error(array('error' => __('Cache key is required', 'lg-aitranslator')));
+            wp_send_json_error(array('error' => __('Cache key is required', 'lg-aitranslator')), 400);
+            return;
         }
 
         if (empty($translation)) {
-            wp_send_json_error(array('error' => __('Translation text is required', 'lg-aitranslator')));
+            wp_send_json_error(array('error' => __('Translation text is required', 'lg-aitranslator')), 400);
+            return;
+        }
+
+        // Validate cache key format (should start with 'text_' and contain hash)
+        if (!preg_match('/^text_[a-f0-9]{32}_[a-z\-]+$/i', $cache_key)) {
+            wp_send_json_error(array('error' => __('Invalid cache key format', 'lg-aitranslator')), 400);
+            return;
         }
 
         // Update cache using WordPress transient
@@ -157,7 +176,7 @@ class LG_AITranslator_Admin_AJAX {
                 'cache_key' => $cache_key
             ));
         } else {
-            wp_send_json_error(array('error' => __('Failed to update translation cache', 'lg-aitranslator')));
+            wp_send_json_error(array('error' => __('Failed to update translation cache', 'lg-aitranslator')), 500);
         }
     }
 }
