@@ -50,11 +50,13 @@ class LG_Language_Switcher_Widget extends WP_Widget {
         }
 
         $type = isset($instance['type']) ? sanitize_text_field($instance['type']) : 'dropdown';
-        echo $this->render_switcher(array( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $this->render_switcher(array(
             'type' => $type,
             'flags' => $show_flags ? 'yes' : 'no',
             'native_names' => $show_native ? 'yes' : 'no'
         ));
+        // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 
         echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
@@ -260,8 +262,8 @@ class LG_Language_Switcher_Widget extends WP_Widget {
             return sanitize_text_field(wp_unslash($_COOKIE['lg_aitranslator_lang']));
         }
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
         if (isset($_GET['lang'])) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
             return sanitize_text_field(wp_unslash($_GET['lang']));
         }
 
