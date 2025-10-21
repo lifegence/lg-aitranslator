@@ -229,6 +229,9 @@ class LG_Content_Translator {
             return $html;
         }
 
+        error_log('[LG AI Translator] Starting HTML translation for language: ' . $target_lang);
+        error_log('[LG AI Translator] HTML length: ' . strlen($html) . ' bytes');
+
         // Extract all text nodes first
         $pattern = '/>([^<>]+)</';
         $text_nodes = array();
@@ -236,6 +239,9 @@ class LG_Content_Translator {
 
         preg_match_all($pattern, $html, $matches, PREG_OFFSET_CAPTURE);
 
+        error_log('[LG AI Translator] Found ' . count($matches[1]) . ' potential text nodes');
+
+        $extracted_count = 0;
         foreach ($matches[1] as $index => $match) {
             $text = $match[0];
 
@@ -247,6 +253,11 @@ class LG_Content_Translator {
             // Skip very short text (likely not meaningful)
             if (mb_strlen(trim($text)) < 3) {
                 continue;
+            }
+
+            $extracted_count++;
+            if ($extracted_count <= 5) {
+                error_log('[LG AI Translator] Sample text ' . $extracted_count . ': ' . substr($text, 0, 100));
             }
 
             // Check individual text cache
@@ -262,9 +273,13 @@ class LG_Content_Translator {
             }
         }
 
+        error_log('[LG AI Translator] Extracted ' . $extracted_count . ' text nodes, ' . count($text_nodes) . ' need translation');
+
         // Batch translate all uncached text nodes
         if (!empty($text_nodes)) {
+            error_log('[LG AI Translator] Starting batch translation of ' . count($text_nodes) . ' texts');
             $batch_translations = $this->batch_translate_texts($text_nodes, $target_lang);
+            error_log('[LG AI Translator] Batch translation completed, got ' . count($batch_translations) . ' results');
 
             // Cache and merge results
             foreach ($batch_translations as $original => $translated) {
@@ -278,11 +293,13 @@ class LG_Content_Translator {
 
         // Replace all text nodes with translations
         if (!empty($placeholders)) {
+            error_log('[LG AI Translator] Replacing ' . count($placeholders) . ' text nodes with translations');
             foreach ($placeholders as $original => $translated) {
                 $html = str_replace('>' . $original . '<', '>' . $translated . '<', $html);
             }
         }
 
+        error_log('[LG AI Translator] HTML translation completed');
         return $html;
     }
 
