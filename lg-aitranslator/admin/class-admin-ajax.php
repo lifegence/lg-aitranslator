@@ -115,8 +115,8 @@ class LG_AITranslator_Admin_AJAX {
 
         if ($result || $current_version === $new_version) {
             wp_send_json_success(array(
-                /* translators: 1: Old cache version number, 2: New cache version number */
                 'message' => sprintf(
+                    /* translators: 1: Old cache version number, 2: New cache version number */
                     __('Cache version incremented from %1$d to %2$d. All translations will be refreshed.', 'lg-aitranslator'),
                     $current_version,
                     $new_version

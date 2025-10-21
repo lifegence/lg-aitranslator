@@ -96,8 +96,9 @@ class LG_URL_Rewriter {
 
                 // Update REQUEST_URI to point to the original path
                 $query = wp_parse_url($request_uri, PHP_URL_QUERY);
-                $_SERVER['REQUEST_URI'] = $new_path . ($query ? '?' . $query : '');
-                LG_Error_Handler::debug('URL Rewriter - Updated REQUEST_URI', array('new_uri' => $_SERVER['REQUEST_URI']));
+                $new_request_uri = $new_path . ($query ? '?' . $query : '');
+                $_SERVER['REQUEST_URI'] = $new_request_uri;
+                LG_Error_Handler::debug('URL Rewriter - Updated REQUEST_URI', array('new_uri' => $new_request_uri));
             } else {
                 LG_Error_Handler::debug('URL Rewriter - Language not supported', array('lang' => $detected_lang));
             }

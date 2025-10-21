@@ -49,8 +49,9 @@ class LG_Language_Switcher_Widget extends WP_Widget {
             echo $args['before_title'] . esc_html($title) . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         }
 
+        $type = isset($instance['type']) ? sanitize_text_field($instance['type']) : 'dropdown';
         echo $this->render_switcher(array( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-            'type' => $instance['type'] ?? 'dropdown',
+            'type' => $type,
             'flags' => $show_flags ? 'yes' : 'no',
             'native_names' => $show_native ? 'yes' : 'no'
         ));

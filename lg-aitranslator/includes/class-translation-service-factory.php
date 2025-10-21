@@ -33,8 +33,8 @@ class LG_Translation_Service_Factory {
                 return new LG_OpenAI_Translation_Service();
 
             default:
-                /* translators: %s: Provider name */
                 throw new Exception( // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+                    /* translators: %s: Provider name */
                     sprintf(__('Unsupported translation provider: %s', 'lg-aitranslator'), $provider)
                 );
         }

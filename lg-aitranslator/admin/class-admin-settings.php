@@ -24,6 +24,7 @@ class LG_AITranslator_Admin_Settings {
         }
 
         // Handle form submission
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified inside save_settings()
         if (isset($_POST['lg_aitranslator_settings_nonce'])) {
             $this->save_settings();
         }
@@ -554,8 +555,8 @@ class LG_AITranslator_Admin_Settings {
     private function update_htaccess($settings) {
         $htaccess_file = ABSPATH . '.htaccess';
 
-        // Check if .htaccess is writable
-        if (!is_writable($htaccess_file)) {
+        // Check if .htaccess is writable using WP_Filesystem
+        if (!file_exists($htaccess_file) || !wp_is_writable($htaccess_file)) {
             add_settings_error(
                 'lg_aitranslator_messages',
                 'lg_aitranslator_htaccess_error',
@@ -583,16 +584,13 @@ class LG_AITranslator_Admin_Settings {
         $lang_pattern = implode('|', array_map('preg_quote', $languages));
 
         // Create rewrite rules
-        $rewrite_rules = <<<EOT
-# BEGIN LG-AITranslator
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteBase /
-RewriteRule ^($lang_pattern)(/(.*))?/?$ index.php?lang=\$1&lg_translated_path=\$3 [L,QSA]
-</IfModule>
-# END LG-AITranslator
-
-EOT;
+        $rewrite_rules = "# BEGIN LG-AITranslator\n";
+        $rewrite_rules .= "<IfModule mod_rewrite.c>\n";
+        $rewrite_rules .= "RewriteEngine On\n";
+        $rewrite_rules .= "RewriteBase /\n";
+        $rewrite_rules .= "RewriteRule ^($lang_pattern)(/(.*))?/?$ index.php?lang=\$1&lg_translated_path=\$3 [L,QSA]\n";
+        $rewrite_rules .= "</IfModule>\n";
+        $rewrite_rules .= "# END LG-AITranslator\n\n";
 
         // Prepend our rules to existing content
         $new_htaccess = $rewrite_rules . $htaccess_content;

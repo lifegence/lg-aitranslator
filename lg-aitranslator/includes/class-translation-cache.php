@@ -137,6 +137,7 @@ class LG_Translation_Cache {
 
             default:
                 // Clear WordPress transients
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Required for cache cleanup
                 $result = $wpdb->query(
                     $wpdb->prepare(
                         "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
@@ -170,6 +171,7 @@ class LG_Translation_Cache {
         );
 
         if ($this->backend === 'transients') {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Required for cache stats
             $result = $wpdb->get_results(
                 $wpdb->prepare(
                     "SELECT COUNT(*) as count, SUM(LENGTH(option_value)) as size
