@@ -271,9 +271,10 @@ class LG_URL_Rewriter {
      */
     public function handle_legacy_redirect() {
         // Check if old ?lang= parameter is used
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
         if (isset($_GET['lang']) && !empty($_GET['lang'])) {
             $lang = sanitize_text_field(wp_unslash($_GET['lang']));
+            // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
             // Validate language
             if (!in_array($lang, $this->supported_languages, true)) {

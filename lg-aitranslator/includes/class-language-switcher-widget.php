@@ -262,10 +262,11 @@ class LG_Language_Switcher_Widget extends WP_Widget {
             return sanitize_text_field(wp_unslash($_COOKIE['lg_aitranslator_lang']));
         }
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
         if (isset($_GET['lang'])) {
             return sanitize_text_field(wp_unslash($_GET['lang']));
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
         return $default;
     }
