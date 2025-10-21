@@ -98,6 +98,12 @@ class LG_Content_Translator {
 
         // Get current language
         $current_lang = $this->url_rewriter->get_current_language();
+
+        // Debug: Log language detection
+        error_log('LG_Content_Translator::start_output_buffer - Current lang: ' . $current_lang);
+        error_log('LG_Content_Translator::start_output_buffer - Global var: ' . (isset($GLOBALS['lg_aitranslator_current_lang']) ? $GLOBALS['lg_aitranslator_current_lang'] : 'NOT SET'));
+        error_log('LG_Content_Translator::start_output_buffer - REQUEST_URI: ' . $_SERVER['REQUEST_URI']);
+        error_log('LG_Content_Translator::start_output_buffer - Query var lang: ' . get_query_var('lang'));
         $default_lang = $this->url_rewriter->get_default_language();
 
         // Only buffer if not default language

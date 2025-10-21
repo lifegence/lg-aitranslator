@@ -72,11 +72,17 @@ class LG_URL_Rewriter {
         $request_uri = $_SERVER['REQUEST_URI'] ?? '';
         $path = parse_url($request_uri, PHP_URL_PATH);
 
+        // Debug logging
+        error_log('LG_URL_Rewriter::process_language_prefix - Original REQUEST_URI: ' . $request_uri);
+        error_log('LG_URL_Rewriter::process_language_prefix - Path: ' . $path);
+
         // Check if path starts with a language prefix
         $language_pattern = $this->get_language_pattern();
+        error_log('LG_URL_Rewriter::process_language_prefix - Language pattern: ' . $language_pattern);
 
         if (preg_match('#^/(' . $language_pattern . ')(/|$)#', $path, $matches)) {
             $detected_lang = $matches[1];
+            error_log('LG_URL_Rewriter::process_language_prefix - Detected lang from regex: ' . $detected_lang);
 
             // Validate language
             if (in_array($detected_lang, $this->supported_languages)) {
@@ -84,12 +90,20 @@ class LG_URL_Rewriter {
                 $GLOBALS['lg_aitranslator_current_lang'] = $detected_lang;
                 $this->current_language = $detected_lang;
 
+                error_log('LG_URL_Rewriter::process_language_prefix - Language validated and stored: ' . $detected_lang);
+                error_log('LG_URL_Rewriter::process_language_prefix - Global var set to: ' . $GLOBALS['lg_aitranslator_current_lang']);
+
                 // Remove language prefix from REQUEST_URI
                 $new_path = preg_replace('#^/' . preg_quote($detected_lang, '#') . '(/|$)#', '/', $path);
 
                 // Update REQUEST_URI to point to the original path
                 $_SERVER['REQUEST_URI'] = $new_path . (parse_url($request_uri, PHP_URL_QUERY) ? '?' . parse_url($request_uri, PHP_URL_QUERY) : '');
+                error_log('LG_URL_Rewriter::process_language_prefix - New REQUEST_URI: ' . $_SERVER['REQUEST_URI']);
+            } else {
+                error_log('LG_URL_Rewriter::process_language_prefix - Language NOT in supported list: ' . $detected_lang);
             }
+        } else {
+            error_log('LG_URL_Rewriter::process_language_prefix - No language prefix detected in path');
         }
     }
 
