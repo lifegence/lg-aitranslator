@@ -311,17 +311,15 @@ class LG_Content_Translator {
             return array();
         }
 
-        // Split into smaller chunks to avoid API timeouts
-        $chunk_size = 50; // Translate max 50 texts at once
-        $chunks = array_chunk($texts, $chunk_size, true);
-        $all_results = array();
+        // Translate ALL texts in a SINGLE API call to avoid rate limits
+        // This uses only 1 API request per page instead of multiple
+        error_log('[LG AI Translator] Batch translating ' . count($texts) . ' texts in single API call');
 
-        foreach ($chunks as $chunk) {
-            $chunk_results = $this->batch_translate_chunk($chunk, $target_lang);
-            $all_results = array_merge($all_results, $chunk_results);
-        }
+        $results = $this->batch_translate_chunk($texts, $target_lang);
 
-        return $all_results;
+        error_log('[LG AI Translator] Batch translation returned ' . count($results) . ' results');
+
+        return $results;
     }
 
     /**
