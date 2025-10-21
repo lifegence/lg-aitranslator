@@ -151,30 +151,88 @@ class LG_Content_Translator {
             return $html;
         }
 
-        // Extract and translate text content from HTML
-        // This is a simplified approach - extract visible text
+        // Extract all text nodes first
         $pattern = '/>([^<>]+)</';
+        $text_nodes = array();
+        $placeholders = array();
 
-        $translated = preg_replace_callback($pattern, function($matches) use ($target_lang) {
-            $text = $matches[1];
+        preg_match_all($pattern, $html, $matches, PREG_OFFSET_CAPTURE);
+
+        foreach ($matches[1] as $index => $match) {
+            $text = $match[0];
 
             // Skip if text is only whitespace, numbers, or special characters
             if (trim($text) === '' || !preg_match('/\p{L}/u', $text)) {
-                return $matches[0];
+                continue;
             }
 
             // Skip very short text (likely not meaningful)
             if (mb_strlen(trim($text)) < 3) {
-                return $matches[0];
+                continue;
             }
 
-            // Translate the text
-            $translated_text = $this->translate_text($text, $target_lang);
+            // Check individual text cache
+            $cache_key = 'text_' . md5($text) . '_' . $target_lang;
+            $cached = $this->cache->get($cache_key);
 
-            return '>' . $translated_text . '<';
-        }, $html);
+            if ($cached !== false) {
+                // Use cached translation
+                $placeholders[$text] = $cached;
+            } else {
+                // Need to translate
+                $text_nodes[] = $text;
+            }
+        }
 
-        return $translated;
+        // Batch translate all uncached text nodes
+        if (!empty($text_nodes)) {
+            $batch_translations = $this->batch_translate_texts($text_nodes, $target_lang);
+
+            // Cache and merge results
+            foreach ($batch_translations as $original => $translated) {
+                $placeholders[$original] = $translated;
+
+                // Cache individual texts
+                $cache_key = 'text_' . md5($original) . '_' . $target_lang;
+                $this->cache->set($cache_key, $translated);
+            }
+        }
+
+        // Replace all text nodes with translations
+        if (!empty($placeholders)) {
+            foreach ($placeholders as $original => $translated) {
+                $html = str_replace('>' . $original . '<', '>' . $translated . '<', $html);
+            }
+        }
+
+        return $html;
+    }
+
+    /**
+     * Batch translate multiple texts in a single API call
+     */
+    private function batch_translate_texts($texts, $target_lang) {
+        if (empty($texts)) {
+            return array();
+        }
+
+        // Combine texts with delimiters
+        $delimiter = "\n###TRANSLATE_SPLIT###\n";
+        $combined_text = implode($delimiter, $texts);
+
+        // Translate the batch
+        $translated_combined = $this->translate_text($combined_text, $target_lang);
+
+        // Split back into individual translations
+        $translated_parts = explode($delimiter, $translated_combined);
+
+        // Map originals to translations
+        $results = array();
+        foreach ($texts as $index => $original) {
+            $results[$original] = isset($translated_parts[$index]) ? $translated_parts[$index] : $original;
+        }
+
+        return $results;
     }
 
     /**
