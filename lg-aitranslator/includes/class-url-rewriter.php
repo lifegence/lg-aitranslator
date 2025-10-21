@@ -69,41 +69,40 @@ class LG_URL_Rewriter {
      * This runs very early to modify REQUEST_URI before WordPress processes it
      */
     public function process_language_prefix() {
-        $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
         $path = wp_parse_url($request_uri, PHP_URL_PATH);
 
         // Debug logging
-        error_log('LG_URL_Rewriter::process_language_prefix - Original REQUEST_URI: ' . $request_uri);
-        error_log('LG_URL_Rewriter::process_language_prefix - Path: ' . $path);
+        LG_Error_Handler::debug('URL Rewriter - Original REQUEST_URI', array('uri' => $request_uri, 'path' => $path));
 
         // Check if path starts with a language prefix
         $language_pattern = $this->get_language_pattern();
-        error_log('LG_URL_Rewriter::process_language_prefix - Language pattern: ' . $language_pattern);
+        LG_Error_Handler::debug('URL Rewriter - Language pattern', array('pattern' => $language_pattern));
 
         if (preg_match('#^/(' . $language_pattern . ')(/|$)#', $path, $matches)) {
             $detected_lang = $matches[1];
-            error_log('LG_URL_Rewriter::process_language_prefix - Detected lang from regex: ' . $detected_lang);
+            LG_Error_Handler::debug('URL Rewriter - Detected language', array('lang' => $detected_lang));
 
             // Validate language
-            if (in_array($detected_lang, $this->supported_languages)) {
+            if (in_array($detected_lang, $this->supported_languages, true)) {
                 // Store detected language globally so other instances can access it
                 $GLOBALS['lg_aitranslator_current_lang'] = $detected_lang;
                 $this->current_language = $detected_lang;
 
-                error_log('LG_URL_Rewriter::process_language_prefix - Language validated and stored: ' . $detected_lang);
-                error_log('LG_URL_Rewriter::process_language_prefix - Global var set to: ' . $GLOBALS['lg_aitranslator_current_lang']);
+                LG_Error_Handler::debug('URL Rewriter - Language validated', array('lang' => $detected_lang));
 
                 // Remove language prefix from REQUEST_URI
                 $new_path = preg_replace('#^/' . preg_quote($detected_lang, '#') . '(/|$)#', '/', $path);
 
                 // Update REQUEST_URI to point to the original path
-                $_SERVER['REQUEST_URI'] = $new_path . (wp_parse_url($request_uri, PHP_URL_QUERY) ? '?' . wp_parse_url($request_uri, PHP_URL_QUERY) : '');
-                error_log('LG_URL_Rewriter::process_language_prefix - New REQUEST_URI: ' . $_SERVER['REQUEST_URI']);
+                $query = wp_parse_url($request_uri, PHP_URL_QUERY);
+                $_SERVER['REQUEST_URI'] = $new_path . ($query ? '?' . $query : '');
+                LG_Error_Handler::debug('URL Rewriter - Updated REQUEST_URI', array('new_uri' => $_SERVER['REQUEST_URI']));
             } else {
-                error_log('LG_URL_Rewriter::process_language_prefix - Language NOT in supported list: ' . $detected_lang);
+                LG_Error_Handler::debug('URL Rewriter - Language not supported', array('lang' => $detected_lang));
             }
         } else {
-            error_log('LG_URL_Rewriter::process_language_prefix - No language prefix detected in path');
+            LG_Error_Handler::debug('URL Rewriter - No language prefix detected');
         }
     }
 
@@ -146,12 +145,12 @@ class LG_URL_Rewriter {
         }
 
         // Check URL path directly
-        $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
         $path = wp_parse_url($request_uri, PHP_URL_PATH);
 
         if (preg_match('#^/(' . $this->get_language_pattern() . ')(/|$)#', $path, $matches)) {
             $detected_lang = $matches[1];
-            if (in_array($detected_lang, $this->supported_languages)) {
+            if (in_array($detected_lang, $this->supported_languages, true)) {
                 $this->current_language = $detected_lang;
                 return $this->current_language;
             }
@@ -159,8 +158,8 @@ class LG_URL_Rewriter {
 
         // Check cookie as fallback
         if (isset($_COOKIE['lg_aitranslator_lang'])) {
-            $cookie_lang = sanitize_text_field($_COOKIE['lg_aitranslator_lang']);
-            if (in_array($cookie_lang, $this->supported_languages)) {
+            $cookie_lang = sanitize_text_field(wp_unslash($_COOKIE['lg_aitranslator_lang']));
+            if (in_array($cookie_lang, $this->supported_languages, true)) {
                 $this->current_language = $cookie_lang;
                 return $this->current_language;
             }
@@ -271,16 +270,21 @@ class LG_URL_Rewriter {
      */
     public function handle_legacy_redirect() {
         // Check if old ?lang= parameter is used
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
         if (isset($_GET['lang']) && !empty($_GET['lang'])) {
-            $lang = sanitize_text_field($_GET['lang']);
+            $lang = sanitize_text_field(wp_unslash($_GET['lang']));
 
             // Validate language
-            if (!in_array($lang, $this->supported_languages)) {
+            if (!in_array($lang, $this->supported_languages, true)) {
                 return;
             }
 
             // Build new URL with language prefix
-            $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+            $is_https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+            $protocol = $is_https ? 'https' : 'http';
+            $host = isset($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : '';
+            $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+            $current_url = $protocol . '://' . $host . $request_uri;
 
             // Remove ?lang= parameter
             $new_url = remove_query_arg('lang', $current_url);
@@ -302,7 +306,11 @@ class LG_URL_Rewriter {
      * Get language-specific URL for current page
      */
     public function get_language_url($lang) {
-        $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $is_https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+        $protocol = $is_https ? 'https' : 'http';
+        $host = isset($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : '';
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+        $current_url = $protocol . '://' . $host . $request_uri;
 
         // Remove existing language prefix
         $url = $this->remove_language_prefix($current_url);

@@ -109,7 +109,8 @@ class LG_Content_Translator {
      * Check if translation edit mode is enabled
      */
     private function is_edit_mode() {
-        return isset($_GET['lg_aitrans_edit']) && $_GET['lg_aitrans_edit'] === '1' && current_user_can('manage_options');
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for edit mode, permission checked with current_user_can
+        return isset($_GET['lg_aitrans_edit']) && sanitize_text_field(wp_unslash($_GET['lg_aitrans_edit'])) === '1' && current_user_can('manage_options');
     }
 
     /**
@@ -125,10 +126,11 @@ class LG_Content_Translator {
         $current_lang = $this->url_rewriter->get_current_language();
 
         // Debug: Log language detection
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
         LG_Error_Handler::debug('Output buffer started', array(
             'current_lang' => $current_lang,
             'global_var' => isset($GLOBALS['lg_aitranslator_current_lang']) ? $GLOBALS['lg_aitranslator_current_lang'] : 'NOT SET',
-            'request_uri' => $_SERVER['REQUEST_URI'],
+            'request_uri' => $request_uri,
             'query_var_lang' => get_query_var('lang')
         ));
         $default_lang = $this->url_rewriter->get_default_language();
@@ -827,7 +829,11 @@ class LG_Content_Translator {
         $is_edit_mode = $this->is_edit_mode();
 
         // Build toggle URL
-        $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $is_https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+        $protocol = $is_https ? 'https' : 'http';
+        $host = isset($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : '';
+        $request_uri_raw = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+        $current_url = $protocol . '://' . $host . $request_uri_raw;
 
         if ($is_edit_mode) {
             // Remove edit parameter

@@ -105,7 +105,7 @@ class LG_API_Key_Manager {
         ));
 
         if (is_wp_error($response)) {
-            error_log('[LG AI Translator] Gemini API WP_Error: ' . $response->get_error_message());
+            LG_Error_Handler::debug('Gemini API validation error', array('error' => $response->get_error_message()));
             return array(
                 'valid' => false,
                 'error' => $response->get_error_message()
@@ -115,8 +115,7 @@ class LG_API_Key_Manager {
         $code = wp_remote_retrieve_response_code($response);
         $body = wp_remote_retrieve_body($response);
 
-        error_log('[LG AI Translator] Gemini API Response Code: ' . $code);
-        error_log('[LG AI Translator] Gemini API Response Body: ' . substr($body, 0, 500));
+        LG_Error_Handler::debug('Gemini API validation response', array('code' => $code, 'body_preview' => substr($body, 0, 500)));
 
         if ($code !== 200) {
             $body_data = json_decode($body, true);

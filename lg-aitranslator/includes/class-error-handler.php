@@ -43,7 +43,7 @@ class LG_Error_Handler {
         }
 
         $formatted_message = self::format_message($message, $level, $context);
-        error_log($formatted_message);
+        error_log($formatted_message); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- This is the logging implementation
 
         // Store critical errors for admin notice
         if (in_array($level, array(self::LEVEL_ERROR, self::LEVEL_CRITICAL))) {

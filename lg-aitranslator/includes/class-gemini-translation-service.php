@@ -69,20 +69,20 @@ class LG_Gemini_Translation_Service extends LG_Abstract_Translation_Service {
         ));
 
         if (is_wp_error($response)) {
-            throw new Exception($response->get_error_message());
+            throw new Exception($response->get_error_message()); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
         }
 
         $code = wp_remote_retrieve_response_code($response);
         if ($code !== 200) {
-            /* translators: 1: HTTP status code, 2: Error message from API */
             $error_body = wp_remote_retrieve_body($response);
-            throw new Exception(sprintf(__('Gemini API error (code %1$d): %2$s', 'lg-aitranslator'), $code, $error_body));
+            /* translators: 1: HTTP status code, 2: Error message from API */
+            throw new Exception(sprintf(__('Gemini API error (code %1$d): %2$s', 'lg-aitranslator'), $code, $error_body)); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
         }
 
         $result = json_decode(wp_remote_retrieve_body($response), true);
 
         if (empty($result['candidates'][0]['content']['parts'][0]['text'])) {
-            throw new Exception(__('Invalid response from Gemini API', 'lg-aitranslator'));
+            throw new Exception(__('Invalid response from Gemini API', 'lg-aitranslator')); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
         }
 
         return trim($result['candidates'][0]['content']['parts'][0]['text']);

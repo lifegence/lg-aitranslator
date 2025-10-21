@@ -43,19 +43,19 @@ class LG_Language_Switcher_Widget extends WP_Widget {
         $show_flags = !empty($instance['show_flags']);
         $show_native = !empty($instance['show_native']);
 
-        echo $args['before_widget'];
+        echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
         if (!empty($title)) {
-            echo $args['before_title'] . esc_html($title) . $args['after_title'];
+            echo $args['before_title'] . esc_html($title) . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         }
 
-        echo $this->render_switcher(array(
+        echo $this->render_switcher(array( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             'type' => $instance['type'] ?? 'dropdown',
             'flags' => $show_flags ? 'yes' : 'no',
             'native_names' => $show_native ? 'yes' : 'no'
         ));
 
-        echo $args['after_widget'];
+        echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -256,11 +256,12 @@ class LG_Language_Switcher_Widget extends WP_Widget {
         $default = $settings['default_language'] ?? 'en';
 
         if (isset($_COOKIE['lg_aitranslator_lang'])) {
-            return sanitize_text_field($_COOKIE['lg_aitranslator_lang']);
+            return sanitize_text_field(wp_unslash($_COOKIE['lg_aitranslator_lang']));
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
         if (isset($_GET['lang'])) {
-            return sanitize_text_field($_GET['lang']);
+            return sanitize_text_field(wp_unslash($_GET['lang']));
         }
 
         return $default;
@@ -276,7 +277,11 @@ class LG_Language_Switcher_Widget extends WP_Widget {
         }
 
         // Fallback: use query parameter
-        $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $is_https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+        $protocol = $is_https ? 'https' : 'http';
+        $host = isset($_SERVER['HTTP_HOST']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST'])) : '';
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+        $current_url = $protocol . '://' . $host . $request_uri;
         return add_query_arg('lang', $lang, $current_url);
     }
 

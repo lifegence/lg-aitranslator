@@ -229,10 +229,10 @@ class LG_AITranslator_Admin_Settings {
                     <div id="gemini-key-status"></div>
                     <p class="description">
                         <?php
-                /* translators: %s: Model name */
+                        /* translators: %s: URL to Google AI Studio */
                         printf(
-                            __('Get your API key from <a href="%s" target="_blank">Google AI Studio</a>', 'lg-aitranslator'),
-                            'https://aistudio.google.com/app/apikey'
+                            esc_html__('Get your API key from ', 'lg-aitranslator') . '<a href="%s" target="_blank">Google AI Studio</a>',
+                            esc_url('https://aistudio.google.com/app/apikey')
                         );
                         ?>
                         <br>
@@ -276,11 +276,11 @@ class LG_AITranslator_Admin_Settings {
                     <button type="button" id="test-openai-key" class="button"><?php esc_html_e('Test Connection', 'lg-aitranslator'); ?></button>
                     <div id="openai-key-status"></div>
                     <p class="description">
-                /* translators: %s: Model name */
                         <?php
+                        /* translators: %s: URL to OpenAI Platform */
                         printf(
-                            __('Get your API key from <a href="%s" target="_blank">OpenAI Platform</a>', 'lg-aitranslator'),
-                            'https://platform.openai.com/api-keys'
+                            esc_html__('Get your API key from ', 'lg-aitranslator') . '<a href="%s" target="_blank">OpenAI Platform</a>',
+                            esc_url('https://platform.openai.com/api-keys')
                         );
                         ?>
                         <br>
@@ -464,8 +464,9 @@ class LG_AITranslator_Admin_Settings {
      * Save settings
      */
     private function save_settings() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified on the next line
         if (!isset($_POST['lg_aitranslator_settings_nonce']) ||
-            !wp_verify_nonce($_POST['lg_aitranslator_settings_nonce'], 'lg_aitranslator_settings')) {
+            !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['lg_aitranslator_settings_nonce'])), 'lg_aitranslator_settings')) {
             return;
         }
 
@@ -477,17 +478,17 @@ class LG_AITranslator_Admin_Settings {
 
         // General settings
         $settings['enabled'] = isset($_POST['enabled']);
-        $settings['default_language'] = sanitize_text_field($_POST['default_language'] ?? 'en');
-        $settings['supported_languages'] = isset($_POST['supported_languages']) ? array_map('sanitize_text_field', $_POST['supported_languages']) : array();
+        $settings['default_language'] = isset($_POST['default_language']) ? sanitize_text_field(wp_unslash($_POST['default_language'])) : 'en';
+        $settings['supported_languages'] = isset($_POST['supported_languages']) ? array_map('sanitize_text_field', wp_unslash($_POST['supported_languages'])) : array();
 
         // Provider settings
-        $settings['provider'] = sanitize_text_field($_POST['provider'] ?? 'gemini');
+        $settings['provider'] = isset($_POST['provider']) ? sanitize_text_field(wp_unslash($_POST['provider'])) : 'gemini';
 
         // Model selection based on provider
         if ($settings['provider'] === 'gemini' && !empty($_POST['gemini_model'])) {
-            $settings['model'] = sanitize_text_field($_POST['gemini_model']);
+            $settings['model'] = sanitize_text_field(wp_unslash($_POST['gemini_model']));
         } elseif ($settings['provider'] === 'openai' && !empty($_POST['openai_model'])) {
-            $settings['model'] = sanitize_text_field($_POST['openai_model']);
+            $settings['model'] = sanitize_text_field(wp_unslash($_POST['openai_model']));
         }
 
         // API keys - only update if non-empty value provided
@@ -496,8 +497,9 @@ class LG_AITranslator_Admin_Settings {
 
         // Handle Gemini API key
         if (!empty($_POST['gemini_api_key'])) {
-            $settings['gemini_api_key'] = $key_manager->encrypt_key($_POST['gemini_api_key']);
-            $settings['gemini_api_key_display'] = substr($_POST['gemini_api_key'], 0, 10) . '...';
+            $gemini_key = wp_unslash($_POST['gemini_api_key']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- API keys should not be sanitized
+            $settings['gemini_api_key'] = $key_manager->encrypt_key($gemini_key);
+            $settings['gemini_api_key_display'] = substr($gemini_key, 0, 10) . '...';
         } else {
             // Preserve existing encrypted key if no new key provided
             $settings['gemini_api_key'] = $old_settings['gemini_api_key'] ?? '';
@@ -506,8 +508,9 @@ class LG_AITranslator_Admin_Settings {
 
         // Handle OpenAI API key
         if (!empty($_POST['openai_api_key'])) {
-            $settings['openai_api_key'] = $key_manager->encrypt_key($_POST['openai_api_key']);
-            $settings['openai_api_key_display'] = substr($_POST['openai_api_key'], 0, 10) . '...';
+            $openai_key = wp_unslash($_POST['openai_api_key']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- API keys should not be sanitized
+            $settings['openai_api_key'] = $key_manager->encrypt_key($openai_key);
+            $settings['openai_api_key_display'] = substr($openai_key, 0, 10) . '...';
         } else {
             // Preserve existing encrypted key if no new key provided
             $settings['openai_api_key'] = $old_settings['openai_api_key'] ?? '';
@@ -515,13 +518,13 @@ class LG_AITranslator_Admin_Settings {
         }
 
         // Quality settings
-        $settings['translation_quality'] = sanitize_text_field($_POST['translation_quality'] ?? 'standard');
-        $settings['translation_temperature'] = floatval($_POST['translation_temperature'] ?? 0.3);
+        $settings['translation_quality'] = isset($_POST['translation_quality']) ? sanitize_text_field(wp_unslash($_POST['translation_quality'])) : 'standard';
+        $settings['translation_temperature'] = isset($_POST['translation_temperature']) ? floatval(wp_unslash($_POST['translation_temperature'])) : 0.3;
 
         // Cache settings
         $settings['cache_enabled'] = isset($_POST['cache_enabled']);
-        $settings['cache_ttl'] = intval($_POST['cache_ttl'] ?? 86400);
-        $settings['cache_backend'] = sanitize_text_field($_POST['cache_backend'] ?? 'transients');
+        $settings['cache_ttl'] = isset($_POST['cache_ttl']) ? intval(wp_unslash($_POST['cache_ttl'])) : 86400;
+        $settings['cache_backend'] = isset($_POST['cache_backend']) ? sanitize_text_field(wp_unslash($_POST['cache_backend'])) : 'transients';
 
         // Advanced settings
         $settings['rate_limit_enabled'] = isset($_POST['rate_limit_enabled']);
