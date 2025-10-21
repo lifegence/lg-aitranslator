@@ -745,11 +745,12 @@ class LG_Content_Translator {
     }
 
     /**
-     * Generate cache key
+     * Generate cache key (unified with translation services)
      */
     private function generate_cache_key($type, $id, $lang, $content) {
-        $hash = md5($content);
-        return "lg_aitrans_{$type}_{$id}_{$lang}_{$hash}";
+        $cache_version = get_option('lg_aitranslator_cache_version', 1);
+        $hash = md5($content . $cache_version);
+        return "{$type}_{$hash}_{$lang}";
     }
 
     /**

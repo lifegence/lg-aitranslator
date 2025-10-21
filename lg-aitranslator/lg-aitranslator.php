@@ -86,6 +86,7 @@ class LG_AITranslator {
 
         // Core classes
         require_once LG_AITRANS_PLUGIN_DIR . 'includes/class-translation-service-interface.php';
+        require_once LG_AITRANS_PLUGIN_DIR . 'includes/class-abstract-translation-service.php';
         require_once LG_AITRANS_PLUGIN_DIR . 'includes/class-translation-service-factory.php';
         require_once LG_AITRANS_PLUGIN_DIR . 'includes/class-gemini-translation-service.php';
         require_once LG_AITRANS_PLUGIN_DIR . 'includes/class-openai-translation-service.php';
