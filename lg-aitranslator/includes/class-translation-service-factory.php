@@ -33,6 +33,7 @@ class LG_Translation_Service_Factory {
                 return new LG_OpenAI_Translation_Service();
 
             default:
+        /* translators: %s: Provider name */
                 throw new Exception(
                     sprintf(__('Unsupported translation provider: %s', 'lg-aitranslator'), $provider)
                 );

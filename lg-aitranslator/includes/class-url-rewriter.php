@@ -70,7 +70,7 @@ class LG_URL_Rewriter {
      */
     public function process_language_prefix() {
         $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-        $path = parse_url($request_uri, PHP_URL_PATH);
+        $path = wp_parse_url($request_uri, PHP_URL_PATH);
 
         // Debug logging
         error_log('LG_URL_Rewriter::process_language_prefix - Original REQUEST_URI: ' . $request_uri);
@@ -97,7 +97,7 @@ class LG_URL_Rewriter {
                 $new_path = preg_replace('#^/' . preg_quote($detected_lang, '#') . '(/|$)#', '/', $path);
 
                 // Update REQUEST_URI to point to the original path
-                $_SERVER['REQUEST_URI'] = $new_path . (parse_url($request_uri, PHP_URL_QUERY) ? '?' . parse_url($request_uri, PHP_URL_QUERY) : '');
+                $_SERVER['REQUEST_URI'] = $new_path . (wp_parse_url($request_uri, PHP_URL_QUERY) ? '?' . wp_parse_url($request_uri, PHP_URL_QUERY) : '');
                 error_log('LG_URL_Rewriter::process_language_prefix - New REQUEST_URI: ' . $_SERVER['REQUEST_URI']);
             } else {
                 error_log('LG_URL_Rewriter::process_language_prefix - Language NOT in supported list: ' . $detected_lang);
@@ -147,7 +147,7 @@ class LG_URL_Rewriter {
 
         // Check URL path directly
         $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-        $path = parse_url($request_uri, PHP_URL_PATH);
+        $path = wp_parse_url($request_uri, PHP_URL_PATH);
 
         if (preg_match('#^/(' . $this->get_language_pattern() . ')(/|$)#', $path, $matches)) {
             $detected_lang = $matches[1];
@@ -218,7 +218,7 @@ class LG_URL_Rewriter {
         }
 
         // Parse URL
-        $parsed = parse_url($url);
+        $parsed = wp_parse_url($url);
         $path = $parsed['path'] ?? '/';
 
         // Check if language prefix already exists
@@ -238,7 +238,7 @@ class LG_URL_Rewriter {
      * Remove language prefix from URL
      */
     public function remove_language_prefix($url) {
-        $parsed = parse_url($url);
+        $parsed = wp_parse_url($url);
         $path = $parsed['path'] ?? '/';
 
         // Remove language prefix
@@ -287,7 +287,7 @@ class LG_URL_Rewriter {
 
             // Add language prefix if not default
             if ($lang !== $this->default_language) {
-                $parsed = parse_url($new_url);
+                $parsed = wp_parse_url($new_url);
                 $parsed['path'] = '/' . $lang . ($parsed['path'] ?? '/');
                 $new_url = $this->build_url($parsed);
             }

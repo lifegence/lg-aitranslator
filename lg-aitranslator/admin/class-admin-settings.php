@@ -229,6 +229,7 @@ class LG_AITranslator_Admin_Settings {
                     <div id="gemini-key-status"></div>
                     <p class="description">
                         <?php
+                /* translators: %s: Model name */
                         printf(
                             __('Get your API key from <a href="%s" target="_blank">Google AI Studio</a>', 'lg-aitranslator'),
                             'https://aistudio.google.com/app/apikey'
@@ -275,6 +276,7 @@ class LG_AITranslator_Admin_Settings {
                     <button type="button" id="test-openai-key" class="button"><?php esc_html_e('Test Connection', 'lg-aitranslator'); ?></button>
                     <div id="openai-key-status"></div>
                     <p class="description">
+                /* translators: %s: Model name */
                         <?php
                         printf(
                             __('Get your API key from <a href="%s" target="_blank">OpenAI Platform</a>', 'lg-aitranslator'),

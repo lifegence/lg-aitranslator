@@ -191,7 +191,7 @@ class LG_Content_Translator {
 
         // Get site URL
         $site_url = home_url();
-        $site_domain = parse_url($site_url, PHP_URL_HOST);
+        $site_domain = wp_parse_url($site_url, PHP_URL_HOST);
 
         // Pattern to match href attributes
         $pattern = '/href=["\']([^"\']+)["\']/i';

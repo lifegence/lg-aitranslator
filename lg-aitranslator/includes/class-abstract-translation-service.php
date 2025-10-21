@@ -74,6 +74,7 @@ abstract class LG_Abstract_Translation_Service implements LG_Translation_Service
         $this->cache = new LG_Translation_Cache();
 
         if (empty($this->api_key)) {
+        /* translators: %s: Provider name (gemini or openai) */
             throw new Exception(
                 sprintf(__('%s API key not configured', 'lg-aitranslator'), ucfirst($provider_name))
             );

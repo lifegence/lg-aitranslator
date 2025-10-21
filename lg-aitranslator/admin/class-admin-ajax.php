@@ -36,7 +36,7 @@ class LG_AITranslator_Admin_AJAX {
             wp_send_json_error(array('error' => __('Unauthorized', 'lg-aitranslator')));
         }
 
-        $api_key = sanitize_text_field($_POST['api_key'] ?? '');
+        $api_key = isset($_POST['api_key']) ? sanitize_text_field(wp_unslash($_POST['api_key'])) : '';
 
         if (empty($api_key)) {
             wp_send_json_error(array('error' => __('Please enter an API key', 'lg-aitranslator')));
@@ -62,7 +62,7 @@ class LG_AITranslator_Admin_AJAX {
             wp_send_json_error(array('error' => __('Unauthorized', 'lg-aitranslator')));
         }
 
-        $api_key = sanitize_text_field($_POST['api_key'] ?? '');
+        $api_key = isset($_POST['api_key']) ? sanitize_text_field(wp_unslash($_POST['api_key'])) : '';
 
         if (empty($api_key)) {
             wp_send_json_error(array('error' => __('Please enter an API key', 'lg-aitranslator')));
@@ -115,8 +115,9 @@ class LG_AITranslator_Admin_AJAX {
 
         if ($result || $current_version === $new_version) {
             wp_send_json_success(array(
+                /* translators: 1: Old cache version number, 2: New cache version number */
                 'message' => sprintf(
-                    __('Cache version incremented from %d to %d. All translations will be refreshed.', 'lg-aitranslator'),
+                    __('Cache version incremented from %1$d to %2$d. All translations will be refreshed.', 'lg-aitranslator'),
                     $current_version,
                     $new_version
                 )
@@ -147,8 +148,8 @@ class LG_AITranslator_Admin_AJAX {
         }
 
         // Validate and sanitize inputs
-        $cache_key = isset($_POST['cache_key']) ? sanitize_text_field($_POST['cache_key']) : '';
-        $translation = isset($_POST['translation']) ? wp_kses_post($_POST['translation']) : '';
+        $cache_key = isset($_POST['cache_key']) ? sanitize_text_field(wp_unslash($_POST['cache_key'])) : '';
+        $translation = isset($_POST['translation']) ? wp_kses_post(wp_unslash($_POST['translation'])) : '';
 
         if (empty($cache_key)) {
             wp_send_json_error(array('error' => __('Cache key is required', 'lg-aitranslator')), 400);

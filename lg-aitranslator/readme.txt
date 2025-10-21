@@ -1,8 +1,8 @@
 === Lifegence AITranslator ===
 Contributors: lifegence
-Tags: translation, multilingual, AI, google gemini, openai, language, i18n, internationalization
+Tags: translation, multilingual, AI, gemini, openai
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.8
 Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later

@@ -133,9 +133,6 @@ class LG_AITranslator {
         // Shortcodes
         add_shortcode('lg-translator', array($this, 'language_switcher_shortcode'));
 
-        // Load text domain
-        add_action('plugins_loaded', array($this, 'load_textdomain'));
-
         // REST API
         add_action('rest_api_init', array($this, 'register_rest_routes'));
     }
@@ -329,17 +326,6 @@ class LG_AITranslator {
     }
 
     /**
-     * Load plugin text domain
-     */
-    public function load_textdomain() {
-        load_plugin_textdomain(
-            'lg-aitranslator',
-            false,
-            dirname(plugin_basename(__FILE__)) . '/languages/'
-        );
-    }
-
-    /**
      * Register REST API routes
      */
     public function register_rest_routes() {
@@ -457,12 +443,12 @@ class LG_AITranslator {
 
         // Check cookie
         if (isset($_COOKIE['lg_aitranslator_lang'])) {
-            return sanitize_text_field($_COOKIE['lg_aitranslator_lang']);
+            return sanitize_text_field(wp_unslash($_COOKIE['lg_aitranslator_lang']));
         }
 
         // Check query parameter
         if (isset($_GET['lang'])) {
-            return sanitize_text_field($_GET['lang']);
+            return sanitize_text_field(wp_unslash($_GET['lang']));
         }
 
         return $default;

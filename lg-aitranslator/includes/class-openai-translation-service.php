@@ -74,8 +74,9 @@ class LG_OpenAI_Translation_Service extends LG_Abstract_Translation_Service {
 
         $code = wp_remote_retrieve_response_code($response);
         if ($code !== 200) {
+            /* translators: 1: HTTP status code, 2: Error message from API */
             $error_body = wp_remote_retrieve_body($response);
-            throw new Exception(sprintf(__('OpenAI API error (code %d): %s', 'lg-aitranslator'), $code, $error_body));
+            throw new Exception(sprintf(__('OpenAI API error (code %1$d): %2$s', 'lg-aitranslator'), $code, $error_body));
         }
 
         $result = json_decode(wp_remote_retrieve_body($response), true);
