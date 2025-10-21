@@ -96,7 +96,7 @@ class LG_OpenAI_Translation_Service implements LG_Translation_Service_Interface 
         );
 
         $response = wp_remote_post($url, array(
-            'timeout' => 30,
+            'timeout' => 60, // Extended timeout for batch translations
             'headers' => array(
                 'Authorization' => 'Bearer ' . $this->api_key,
                 'Content-Type' => 'application/json'

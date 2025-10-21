@@ -101,7 +101,7 @@ class LG_Gemini_Translation_Service implements LG_Translation_Service_Interface 
         );
 
         $response = wp_remote_post($url, array(
-            'timeout' => 30,
+            'timeout' => 60, // Extended timeout for batch translations
             'headers' => array('Content-Type' => 'application/json'),
             'body' => json_encode($body)
         ));

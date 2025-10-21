@@ -288,23 +288,55 @@ class LG_Content_Translator {
             return array();
         }
 
+        // Split into smaller chunks to avoid API timeouts
+        $chunk_size = 50; // Translate max 50 texts at once
+        $chunks = array_chunk($texts, $chunk_size, true);
+        $all_results = array();
+
+        foreach ($chunks as $chunk) {
+            $chunk_results = $this->batch_translate_chunk($chunk, $target_lang);
+            $all_results = array_merge($all_results, $chunk_results);
+        }
+
+        return $all_results;
+    }
+
+    /**
+     * Translate a chunk of texts
+     */
+    private function batch_translate_chunk($texts, $target_lang) {
+        if (empty($texts)) {
+            return array();
+        }
+
         // Combine texts with delimiters
         $delimiter = "\n###TRANSLATE_SPLIT###\n";
         $combined_text = implode($delimiter, $texts);
 
         // Translate the batch
-        $translated_combined = $this->translate_text($combined_text, $target_lang);
+        try {
+            $translated_combined = $this->translate_text($combined_text, $target_lang);
 
-        // Split back into individual translations
-        $translated_parts = explode($delimiter, $translated_combined);
+            // Split back into individual translations
+            $translated_parts = explode($delimiter, $translated_combined);
 
-        // Map originals to translations
-        $results = array();
-        foreach ($texts as $index => $original) {
-            $results[$original] = isset($translated_parts[$index]) ? $translated_parts[$index] : $original;
+            // Map originals to translations
+            $results = array();
+            foreach ($texts as $index => $original) {
+                $results[$original] = isset($translated_parts[$index]) ? trim($translated_parts[$index]) : $original;
+            }
+
+            return $results;
+        } catch (Exception $e) {
+            error_log('[LG AI Translator] Batch translation failed: ' . $e->getMessage());
+
+            // Return originals on error
+            $results = array();
+            foreach ($texts as $original) {
+                $results[$original] = $original;
+            }
+            return $results;
         }
-
-        return $results;
     }
 
     /**
