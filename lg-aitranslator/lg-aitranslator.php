@@ -447,8 +447,8 @@ class LG_AITranslator {
         }
 
         // Check query parameter
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
         if (isset($_GET['lang'])) {
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public query parameter for language selection
             return sanitize_text_field(wp_unslash($_GET['lang']));
         }
 
