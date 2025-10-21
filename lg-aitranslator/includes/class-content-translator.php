@@ -136,10 +136,82 @@ class LG_Content_Translator {
         // Translate text nodes in HTML
         $translated_html = $this->translate_html_text_nodes($html, $current_lang);
 
+        // Add language prefix to internal links
+        $translated_html = $this->add_language_prefix_to_links($translated_html, $current_lang);
+
         // Cache result
         $this->cache->set($cache_key, $translated_html);
 
         return $translated_html;
+    }
+
+    /**
+     * Add language prefix to all internal links in HTML
+     */
+    private function add_language_prefix_to_links($html, $current_lang) {
+        $default_lang = $this->url_rewriter->get_default_language();
+
+        // Skip if default language
+        if ($current_lang === $default_lang) {
+            return $html;
+        }
+
+        // Get site URL
+        $site_url = home_url();
+        $site_domain = parse_url($site_url, PHP_URL_HOST);
+
+        // Pattern to match href attributes
+        $pattern = '/href=["\']([^"\']+)["\']/i';
+
+        $html = preg_replace_callback($pattern, function($matches) use ($current_lang, $site_url, $site_domain) {
+            $url = $matches[1];
+
+            // Skip external links
+            if (strpos($url, 'http') === 0 && strpos($url, $site_domain) === false) {
+                return $matches[0];
+            }
+
+            // Skip anchors, mailto, tel, javascript
+            if (strpos($url, '#') === 0 ||
+                strpos($url, 'mailto:') === 0 ||
+                strpos($url, 'tel:') === 0 ||
+                strpos($url, 'javascript:') === 0) {
+                return $matches[0];
+            }
+
+            // Skip admin URLs
+            if (strpos($url, '/wp-admin') !== false ||
+                strpos($url, '/wp-content') !== false ||
+                strpos($url, '/wp-includes') !== false) {
+                return $matches[0];
+            }
+
+            // Check if URL already has language prefix
+            $supported_languages = $this->settings['supported_languages'] ?? array();
+            $lang_pattern = '/^\/(' . implode('|', array_map('preg_quote', $supported_languages)) . ')\//';
+
+            if (preg_match($lang_pattern, $url)) {
+                return $matches[0]; // Already has language prefix
+            }
+
+            // Add language prefix to relative URLs
+            if (strpos($url, '/') === 0) {
+                $new_url = '/' . $current_lang . $url;
+                return 'href="' . $new_url . '"';
+            }
+
+            // Add language prefix to absolute site URLs
+            if (strpos($url, $site_url) === 0) {
+                $path = str_replace($site_url, '', $url);
+                $new_url = $site_url . '/' . $current_lang . $path;
+                return 'href="' . $new_url . '"';
+            }
+
+            // Return unchanged for other cases
+            return $matches[0];
+        }, $html);
+
+        return $html;
     }
 
     /**
