@@ -1,4 +1,4 @@
-# LG AI Translator - WordPress Plugin Description
+# Lifegence AITranslator - WordPress Plugin Description
 
 ## Short Description (150 characters max)
 AI-powered automatic translation plugin using Google Gemini and OpenAI GPT. Translate your entire WordPress site into multiple languages instantly.
@@ -7,7 +7,7 @@ AI-powered automatic translation plugin using Google Gemini and OpenAI GPT. Tran
 
 ### Transform Your WordPress Site into a Multilingual Platform with AI
 
-**LG AI Translator** is a powerful WordPress plugin that automatically translates your entire website into multiple languages using cutting-edge AI technology from Google Gemini and OpenAI GPT.
+**Lifegence AITranslator** is a powerful WordPress plugin that automatically translates your entire website into multiple languages using cutting-edge AI technology from Google Gemini and OpenAI GPT.
 
 ### 🌟 Key Features
 
@@ -67,7 +67,7 @@ Multiple display formats:
 
 1. Upload the plugin files to `/wp-content/plugins/lg-aitranslator/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to Settings → LG AI Translator
+3. Go to Settings → Lifegence AITranslator
 4. Enter your Google Gemini API key or OpenAI API key
 5. Select supported languages
 6. Click "Save Settings"
@@ -131,7 +131,7 @@ Multiple display formats:
 ### 🔄 Cache Management
 
 #### Clear All Cache
-- Settings → LG AI Translator → Advanced Tab
+- Settings → Lifegence AITranslator → Advanced Tab
 - Click "Clear All Cache" button
 - All cached translations are deleted
 - Next page load triggers fresh translation
