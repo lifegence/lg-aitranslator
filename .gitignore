@@ -1,0 +1,44 @@
+# Build artifacts
+*.zip
+lg-aitranslator.zip
+
+# Development files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+Thumbs.db
+
+# Local configuration
+.claude/settings.local.json
+
+# Logs
+*.log
+debug.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# OS Files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# WordPress specific (if testing locally)
+wp-config.php
+.htaccess
+
+# Documentation drafts
+docs/drafts/
+*.draft.md
+
+# Plugin backup files
+*.backup
+*.bak
