@@ -35,8 +35,10 @@ Desktop.ini
 wp-config.php
 .htaccess
 
+# Internal documentation (for development only)
+docs/
+
 # Documentation drafts
-docs/drafts/
 *.draft.md
 
 # Plugin backup files
