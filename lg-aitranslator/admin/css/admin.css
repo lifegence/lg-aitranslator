@@ -23,3 +23,46 @@
 .small-text {
     width: 100px;
 }
+
+/* Custom Languages Section */
+.lg-custom-languages {
+    margin-top: 10px;
+}
+
+.lg-custom-lang-list {
+    margin-bottom: 15px;
+}
+
+.lg-custom-language-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+}
+
+.lg-custom-language-item .lg-lang-display {
+    flex: 1;
+}
+
+.lg-custom-language-item .lg-remove-language {
+    margin-left: auto;
+}
+
+.lg-add-language-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.lg-add-language-form input[type="text"] {
+    flex: 0 0 auto;
+}
+
+#lg-add-language-btn {
+    white-space: nowrap;
+}

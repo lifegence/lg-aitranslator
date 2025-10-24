@@ -166,4 +166,70 @@ jQuery(document).ready(function($) {
             }
         });
     });
+
+    // Custom Languages Management
+    // Add custom language
+    $('#lg-add-language-btn').on('click', function() {
+        var code = $('#lg-new-lang-code').val().trim();
+        var name = $('#lg-new-lang-name').val().trim();
+
+        if (!code || !name) {
+            alert('Please enter both language code and name');
+            return;
+        }
+
+        // Validate code format (alphanumeric, hyphen, underscore only)
+        if (!/^[a-zA-Z0-9_-]+$/.test(code)) {
+            alert('Invalid language code. Use only letters, numbers, hyphens, and underscores.');
+            return;
+        }
+
+        // Check if code already exists
+        if ($('.lg-custom-language-item[data-code="' + code + '"]').length > 0) {
+            alert('Language code "' + code + '" already exists');
+            return;
+        }
+
+        // Add new language item to the list
+        addCustomLanguageItem(code, name);
+
+        // Clear input fields
+        $('#lg-new-lang-code').val('');
+        $('#lg-new-lang-name').val('');
+    });
+
+    // Remove custom language
+    $(document).on('click', '.lg-remove-language', function() {
+        var code = $(this).data('code');
+        if (confirm('Remove language "' + code + '"?')) {
+            $(this).closest('.lg-custom-language-item').remove();
+
+            // If no languages left, show "no custom languages" message
+            if ($('.lg-custom-language-item').length === 0) {
+                $('#lg-custom-language-list').html('<p class="description">No custom languages added yet.</p>');
+            }
+        }
+    });
+
+    // Helper function to add custom language item
+    function addCustomLanguageItem(code, name) {
+        // Remove "no languages" message if it exists
+        $('#lg-custom-language-list .description').remove();
+
+        var item = $('<div class="lg-custom-language-item" data-code="' + code + '"></div>')
+            .append('<input type="hidden" name="custom_language_codes[]" value="' + code + '">')
+            .append('<input type="hidden" name="custom_language_names[]" value="' + name + '">')
+            .append('<span class="lg-lang-display"><strong>' + name + '</strong> (' + code + ')</span>')
+            .append('<button type="button" class="button lg-remove-language" data-code="' + code + '">Remove</button>');
+
+        $('#lg-custom-language-list').append(item);
+    }
+
+    // Enter key to add language
+    $('#lg-new-lang-code, #lg-new-lang-name').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+            e.preventDefault();
+            $('#lg-add-language-btn').click();
+        }
+    });
 });

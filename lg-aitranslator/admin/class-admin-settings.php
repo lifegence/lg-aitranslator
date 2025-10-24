@@ -134,6 +134,15 @@ class LG_AITranslator_Admin_Settings {
 
             <tr>
                 <th scope="row">
+                    <label><?php esc_html_e('Custom Languages', 'lg-aitranslator'); ?></label>
+                </th>
+                <td>
+                    <?php $this->render_custom_languages_section(); ?>
+                </td>
+            </tr>
+
+            <tr>
+                <th scope="row">
                     <label><?php esc_html_e('Language Switcher', 'lg-aitranslator'); ?></label>
                 </th>
                 <td>
@@ -535,6 +544,9 @@ class LG_AITranslator_Admin_Settings {
 
         update_option('lg_aitranslator_settings', $settings);
 
+        // Save custom languages
+        $this->save_custom_languages();
+
         // Update .htaccess with rewrite rules
         $this->update_htaccess($settings);
 
@@ -640,6 +652,169 @@ class LG_AITranslator_Admin_Settings {
             if (!isset($settings[$key])) {
                 $settings[$key] = $value;
             }
+        }
+    }
+
+    /**
+     * Render custom languages section
+     */
+    private function render_custom_languages_section() {
+        $custom = LG_AITranslator::get_custom_languages();
+        ?>
+        <div class="lg-custom-languages">
+            <div id="lg-custom-language-list" class="lg-custom-lang-list">
+                <?php if (empty($custom)): ?>
+                    <p class="description"><?php esc_html_e('No custom languages added yet.', 'lg-aitranslator'); ?></p>
+                <?php else: ?>
+                    <?php foreach ($custom as $code => $name): ?>
+                        <div class="lg-custom-language-item" data-code="<?php echo esc_attr($code); ?>">
+                            <input type="hidden" name="custom_language_codes[]" value="<?php echo esc_attr($code); ?>">
+                            <input type="hidden" name="custom_language_names[]" value="<?php echo esc_attr($name); ?>">
+                            <span class="lg-lang-display">
+                                <strong><?php echo esc_html($name); ?></strong>
+                                (<?php echo esc_html($code); ?>)
+                            </span>
+                            <button type="button" class="button lg-remove-language" data-code="<?php echo esc_attr($code); ?>">
+                                <?php esc_html_e('Remove', 'lg-aitranslator'); ?>
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <div class="lg-add-language-form" style="margin-top: 15px;">
+                <input type="text"
+                    id="lg-new-lang-code"
+                    class="regular-text"
+                    placeholder="<?php esc_attr_e('Language code (e.g., tl, ms, fil)', 'lg-aitranslator'); ?>"
+                    style="width: 200px; margin-right: 10px;">
+                <input type="text"
+                    id="lg-new-lang-name"
+                    class="regular-text"
+                    placeholder="<?php esc_attr_e('Language name (e.g., Tagalog)', 'lg-aitranslator'); ?>"
+                    style="width: 200px; margin-right: 10px;">
+                <button type="button" id="lg-add-language-btn" class="button">
+                    <?php esc_html_e('Add Custom Language', 'lg-aitranslator'); ?>
+                </button>
+            </div>
+
+            <p class="description" style="margin-top: 10px;">
+                <?php esc_html_e('Add custom languages not in the preset list. Use standard language codes (e.g., tl for Tagalog, ms for Malay).', 'lg-aitranslator'); ?>
+            </p>
+        </div>
+        <?php
+    }
+
+    /**
+     * Save custom languages from POST data
+     *
+     * @return bool True on success
+     */
+    private function save_custom_languages() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in parent save_settings()
+        $codes = isset($_POST['custom_language_codes']) ? $_POST['custom_language_codes'] : array();
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in parent save_settings()
+        $names = isset($_POST['custom_language_names']) ? $_POST['custom_language_names'] : array();
+
+        $custom_languages = array();
+
+        foreach ($codes as $index => $code) {
+            // Skip if no corresponding name
+            if (!isset($names[$index])) {
+                continue;
+            }
+
+            // Validate code
+            if (!LG_AITranslator::validate_language_code($code)) {
+                continue;
+            }
+
+            // Sanitize name
+            $name = sanitize_text_field($names[$index]);
+
+            // Skip if name is empty
+            if (empty(trim($name))) {
+                continue;
+            }
+
+            // Add to custom languages
+            $custom_languages[$code] = $name;
+        }
+
+        return update_option('lg_aitranslator_custom_languages', $custom_languages);
+    }
+
+    /**
+     * Get custom languages data in array format
+     *
+     * @return array
+     */
+    private function get_custom_languages_data() {
+        $custom = LG_AITranslator::get_custom_languages();
+        $data = array();
+
+        foreach ($custom as $code => $name) {
+            $data[] = array(
+                'code' => $code,
+                'name' => $name,
+            );
+        }
+
+        return $data;
+    }
+
+    /**
+     * AJAX handler for adding custom language
+     */
+    public function ajax_add_custom_language() {
+        check_ajax_referer('lg_aitranslator_admin', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied', 'lg-aitranslator')));
+        }
+
+        $code = isset($_POST['code']) ? sanitize_text_field(wp_unslash($_POST['code'])) : '';
+        $name = isset($_POST['name']) ? sanitize_text_field(wp_unslash($_POST['name'])) : '';
+
+        if (empty($code) || empty($name)) {
+            wp_send_json_error(array('message' => __('Code and name are required', 'lg-aitranslator')));
+        }
+
+        $result = LG_AITranslator::add_custom_language($code, $name);
+
+        if ($result) {
+            wp_send_json_success(array(
+                'message' => __('Language added successfully', 'lg-aitranslator'),
+                'code' => $code,
+                'name' => $name,
+            ));
+        } else {
+            wp_send_json_error(array('message' => __('Failed to add language', 'lg-aitranslator')));
+        }
+    }
+
+    /**
+     * AJAX handler for removing custom language
+     */
+    public function ajax_remove_custom_language() {
+        check_ajax_referer('lg_aitranslator_admin', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied', 'lg-aitranslator')));
+        }
+
+        $code = isset($_POST['code']) ? sanitize_text_field(wp_unslash($_POST['code'])) : '';
+
+        if (empty($code)) {
+            wp_send_json_error(array('message' => __('Code is required', 'lg-aitranslator')));
+        }
+
+        $result = LG_AITranslator::remove_custom_language($code);
+
+        if ($result) {
+            wp_send_json_success(array('message' => __('Language removed successfully', 'lg-aitranslator')));
+        } else {
+            wp_send_json_error(array('message' => __('Failed to remove language', 'lg-aitranslator')));
         }
     }
 }
