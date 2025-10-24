@@ -712,9 +712,9 @@ class LG_AITranslator_Admin_Settings {
      */
     private function save_custom_languages() {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in parent save_settings()
-        $codes = isset($_POST['custom_language_codes']) ? $_POST['custom_language_codes'] : array();
+        $codes = isset($_POST['custom_language_codes']) ? array_map('sanitize_text_field', wp_unslash($_POST['custom_language_codes'])) : array();
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in parent save_settings()
-        $names = isset($_POST['custom_language_names']) ? $_POST['custom_language_names'] : array();
+        $names = isset($_POST['custom_language_names']) ? array_map('sanitize_text_field', wp_unslash($_POST['custom_language_names'])) : array();
 
         $custom_languages = array();
 
