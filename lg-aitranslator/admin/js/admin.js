@@ -202,7 +202,14 @@ jQuery(document).ready(function($) {
     $(document).on('click', '.lg-remove-language', function() {
         var code = $(this).data('code');
         if (confirm('Remove language "' + code + '"?')) {
+            // Remove from custom language list
             $(this).closest('.lg-custom-language-item').remove();
+
+            // Remove corresponding checkbox from supported languages list
+            $('input[name="supported_languages[]"][value="' + code + '"]').closest('label').remove();
+
+            // Remove from default language dropdown
+            $('#default_language option[value="' + code + '"]').remove();
 
             // If no languages left, show "no custom languages" message
             if ($('.lg-custom-language-item').length === 0) {
@@ -223,6 +230,47 @@ jQuery(document).ready(function($) {
             .append('<button type="button" class="button lg-remove-language" data-code="' + code + '">Remove</button>');
 
         $('#lg-custom-language-list').append(item);
+
+        // Add checkbox to supported languages list
+        addSupportedLanguageCheckbox(code, name);
+
+        // Add to default language dropdown
+        addDefaultLanguageOption(code, name);
+    }
+
+    // Helper function to add checkbox to supported languages list
+    function addSupportedLanguageCheckbox(code, name) {
+        // Find the supported languages fieldset
+        var $fieldset = $('input[name="supported_languages[]"]').first().closest('fieldset');
+
+        if ($fieldset.length > 0) {
+            // Create new checkbox label
+            var $label = $('<label style="display: inline-block; width: 200px; margin-bottom: 5px;"></label>')
+                .append('<input type="checkbox" name="supported_languages[]" value="' + code + '">')
+                .append(' ' + name);
+
+            // Insert before the description paragraph
+            var $description = $fieldset.find('p.description');
+            if ($description.length > 0) {
+                $description.before($label);
+            } else {
+                $fieldset.append($label);
+            }
+        }
+    }
+
+    // Helper function to add option to default language dropdown
+    function addDefaultLanguageOption(code, name) {
+        var $select = $('#default_language');
+        if ($select.length > 0) {
+            // Create new option element
+            var $option = $('<option></option>')
+                .attr('value', code)
+                .text(name + ' (' + code + ')');
+
+            // Append to the select dropdown
+            $select.append($option);
+        }
     }
 
     // Enter key to add language
