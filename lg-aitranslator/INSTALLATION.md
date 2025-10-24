@@ -46,7 +46,7 @@ Developed by **Lifegence Corporation** (https://lifegence.com)
 3. **Translation Engine Tab:**
    - Select Provider (Gemini recommended)
    - Choose Model:
-     - Gemini: `gemini-1.5-flash` (recommended)
+     - Gemini: `gemini-2.5-flash` (recommended)
      - OpenAI: `gpt-4o-mini` (recommended)
    - Paste API Key
    - Click "Test Connection" ✓
@@ -153,7 +153,7 @@ Without cache: Very expensive
 With cache: 80-95% cost reduction
 
 ### 2. Choose Right Model
-- **Gemini 1.5 Flash**: Best cost/quality for most sites
+- **Gemini 2.5 Flash**: Best cost/quality for most sites
 - **GPT-4o Mini**: Higher quality, 2x cost
 - **GPT-4o**: Premium quality, 10x cost (rarely needed)
 
