@@ -228,36 +228,29 @@ For better performance on high-traffic sites:
    - Password: (if required)
 4. Test connection
 
-### Cache Override (Translation Correction)
+### Edit Translations on Your Site
 
-When AI translations need to be corrected or customized, you can override the cached results:
+If an AI translation doesn't sound right, you can edit it directly on your website.
 
-**Use Case**: If an AI translation is incorrect or doesn't fit your brand voice, you can manually correct it and force the system to use your corrected version.
+**How to Edit:**
 
-**How to Override Translations:**
+1. **Enable Edit Mode**
+   - Log in as admin
+   - Click "✏️ 翻訳を編集" in the admin bar
+   - Or add `?edit_translation=1` to the URL
 
-1. **Direct Cache Update** (via WordPress AJAX):
-   ```javascript
-   // Update specific translation
-   jQuery.post(ajaxurl, {
-     action: 'lg_aitrans_update_translation',
-     nonce: lgAITranslator.nonce,
-     cache_key: 'text_abc123..._ja',
-     translation: 'Your corrected translation here'
-   });
-   ```
+2. **Click and Edit**
+   - Click any translated text on the page
+   - Type your correction
+   - Click "Save"
+   - Refresh the page
 
-2. **Force Re-translation** (via Admin Panel):
+3. **Re-translate Everything** (if needed)
    - Go to **Settings → Lifegence AITranslator → Cache** tab
    - Click **Increment Cache Version (Force Re-translate)**
-   - This invalidates all existing translations and requests fresh translations on next page load
-   - Use this when you want to completely refresh all translations (e.g., after prompt improvements)
+   - All pages will be re-translated on next visit
 
-**Cache Version System:**
-- Each translation is tagged with a version number
-- Incrementing the version invalidates all cached translations
-- Useful for bulk translation updates without manually clearing individual entries
-- System automatically re-translates content on next access
+For detailed instructions with screenshots, see the [Translation Editing Guide](docs/cache-override-guide.md).
 
 ## Troubleshooting
 
@@ -285,10 +278,11 @@ When AI translations need to be corrected or customized, you can override the ca
 
 ### Correcting AI Translations
 If an AI translation is incorrect:
-1. Use the cache override API to manually correct the translation
-2. Or increment cache version to force re-translation of all content
-3. For single corrections, use the update translation endpoint
-4. For bulk refresh, increment cache version in admin settings
+1. Enable edit mode: Add `?edit_translation=1` to the URL or click "✏️ 翻訳を編集" in admin bar
+2. Click the text you want to change
+3. Type your correction and save
+4. Refresh the page to see changes
+5. For bulk changes: Use "Increment Cache Version" in Cache settings
 
 ## Requirements
 

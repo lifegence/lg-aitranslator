@@ -111,7 +111,7 @@ Yes! Go to Settings → Lifegence AITranslator → General tab, scroll to the "C
 
 = Can I edit translations manually? =
 
-Yes! The plugin includes an inline translation editor for correcting AI translations. While logged in as admin, click "✏️ 翻訳を編集" in the admin bar to toggle edit mode, then click any text to edit the translation. This is useful when AI translations are generally good but need occasional refinement for brand voice, technical terms, or cultural nuances.
+Yes! Simply click "✏️ 翻訳を編集" in the admin bar (or add ?edit_translation=1 to the URL), then click any text on the page to edit it. Type your correction, save, and refresh. Perfect for fixing brand names, technical terms, or adjusting tone.
 
 = How does caching work? =
 

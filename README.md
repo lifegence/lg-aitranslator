@@ -18,8 +18,8 @@ Transform your WordPress site into a multilingual platform with intelligent, con
 
 ### Performance & Cost Optimization
 - **Smart Caching System**: Reduces API costs by 80-95%
-- **Translation Override**: Manually correct AI translations and update cache
-- **Cache Version Control**: Invalidate all translations for bulk refresh
+- **Edit Translations On-Screen**: Click any text to fix AI translations directly
+- **Bulk Re-translation**: One-click refresh of all translations
 - **Redis Support**: High-performance caching for traffic-intensive sites
 - **Rate Limiting**: Prevent excessive API usage
 - **Budget Controls**: Set monthly spending limits with auto-disable protection
