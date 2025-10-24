@@ -228,6 +228,37 @@ For better performance on high-traffic sites:
    - Password: (if required)
 4. Test connection
 
+### Cache Override (Translation Correction)
+
+When AI translations need to be corrected or customized, you can override the cached results:
+
+**Use Case**: If an AI translation is incorrect or doesn't fit your brand voice, you can manually correct it and force the system to use your corrected version.
+
+**How to Override Translations:**
+
+1. **Direct Cache Update** (via WordPress AJAX):
+   ```javascript
+   // Update specific translation
+   jQuery.post(ajaxurl, {
+     action: 'lg_aitrans_update_translation',
+     nonce: lgAITranslator.nonce,
+     cache_key: 'text_abc123..._ja',
+     translation: 'Your corrected translation here'
+   });
+   ```
+
+2. **Force Re-translation** (via Admin Panel):
+   - Go to **Settings → Lifegence AITranslator → Cache** tab
+   - Click **Increment Cache Version (Force Re-translate)**
+   - This invalidates all existing translations and requests fresh translations on next page load
+   - Use this when you want to completely refresh all translations (e.g., after prompt improvements)
+
+**Cache Version System:**
+- Each translation is tagged with a version number
+- Incrementing the version invalidates all cached translations
+- Useful for bulk translation updates without manually clearing individual entries
+- System automatically re-translates content on next access
+
 ## Troubleshooting
 
 ### API Key Errors
@@ -251,6 +282,13 @@ For better performance on high-traffic sites:
 - Clear cache from Cache tab
 - Verify cache backend is working (test Redis connection)
 - Check disk space for transients
+
+### Correcting AI Translations
+If an AI translation is incorrect:
+1. Use the cache override API to manually correct the translation
+2. Or increment cache version to force re-translation of all content
+3. For single corrections, use the update translation endpoint
+4. For bulk refresh, increment cache version in admin settings
 
 ## Requirements
 

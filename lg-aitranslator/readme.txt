@@ -111,7 +111,7 @@ Yes! Go to Settings → Lifegence AITranslator → General tab, scroll to the "C
 
 = Can I edit translations manually? =
 
-Yes! The plugin includes an inline translation editor. While logged in as admin, click "✏️ 翻訳を編集" in the admin bar to toggle edit mode, then click any text to edit the translation.
+Yes! The plugin includes an inline translation editor for correcting AI translations. While logged in as admin, click "✏️ 翻訳を編集" in the admin bar to toggle edit mode, then click any text to edit the translation. This is useful when AI translations are generally good but need occasional refinement for brand voice, technical terms, or cultural nuances.
 
 = How does caching work? =
 
@@ -141,7 +141,7 @@ Use one of these methods:
 
 = Can I force re-translation of all content? =
 
-Yes! In Settings → Lifegence AITranslator → Advanced tab, click "Increment Cache Version" to invalidate all existing translations and force fresh translation on next page load.
+Yes! In Settings → Lifegence AITranslator → Cache tab, click "Increment Cache Version (Force Re-translate)" to invalidate all existing translations and force fresh translation on next page load. This is useful when you want to refresh all translations after improving translation prompts or when translations need systematic updates.
 
 = What content gets translated? =
 
