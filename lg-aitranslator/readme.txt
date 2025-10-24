@@ -111,7 +111,7 @@ Yes! Go to Settings → Lifegence AITranslator → General tab, scroll to the "C
 
 = Can I edit translations manually? =
 
-Yes! Simply click "✏️ 翻訳を編集" in the admin bar (or add ?edit_translation=1 to the URL), then click any text on the page to edit it. Type your correction, save, and refresh. Perfect for fixing brand names, technical terms, or adjusting tone.
+Yes! Simply click "✏️ Edit Translation" in the admin bar (or add ?edit_translation=1 to the URL), then click any text on the page to edit it. Type your correction, save, and refresh. Perfect for fixing brand names, technical terms, or adjusting tone.
 
 = How does caching work? =
 

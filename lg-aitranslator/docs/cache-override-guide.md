@@ -1,147 +1,147 @@
-# 翻訳の編集方法
+# How to Edit Translations
 
-## 概要
+## Overview
 
-AIの翻訳結果が気に入らない場合、画面上で直接修正できます。
+If you don't like an AI translation, you can edit it directly on your website.
 
-## いつ使うか
+## When to Use
 
-- AIの翻訳が不自然な場合
-- 会社やブランドの言い方に合わせたい場合
-- 専門用語を正しく訳したい場合
-- 文化的に適切な表現にしたい場合
+- AI translation sounds unnatural
+- Need to match your company's brand voice
+- Technical terms need correction
+- Cultural adaptation required
 
-## 翻訳を編集する手順
+## How to Edit Translations
 
-### 1. 編集モードを有効にする
+### 1. Enable Edit Mode
 
-管理者としてログインした状態で、翻訳されたページを表示します。
+While logged in as administrator, visit the translated page.
 
-**方法1: 管理バーから**
-1. ページ上部の管理バー（黒いバー）を確認
-2. 「✏️ 翻訳を編集」ボタンをクリック
-3. 編集モードがオンになります
+**Method 1: From Admin Bar**
+1. Look at the admin bar (black bar) at the top of the page
+2. Click the "✏️ Edit Translation" button
+3. Edit mode is now enabled
 
-**方法2: URLに直接追加**
-URLの最後に `?edit_translation=1` を追加します。
+**Method 2: Add to URL**
+Add `?edit_translation=1` to the end of the URL.
 
-例：
+Example:
 ```
-通常のURL: https://yoursite.com/ja/about
-編集モード: https://yoursite.com/ja/about?edit_translation=1
+Normal URL: https://yoursite.com/ja/about
+Edit Mode:  https://yoursite.com/ja/about?edit_translation=1
 ```
 
-### 2. 翻訳を編集する
+### 2. Edit the Translation
 
-編集モードがオンになると、ページ上の翻訳された文章が**クリック可能**になります。
+When edit mode is on, translated text on the page becomes **clickable**.
 
-1. **修正したい文章をクリック**
-   - カーソルを合わせると黄色い枠が表示されます
-   - クリックすると編集ボックスが開きます
+1. **Click the text you want to fix**
+   - Hover over text to see a yellow border
+   - Click to open the edit box
 
-2. **正しい翻訳を入力**
-   - 表示されたテキストボックスに新しい翻訳を入力
-   - 改行やHTML形式も保持されます
+2. **Type the correct translation**
+   - Enter your new translation in the text box
+   - Line breaks and HTML formatting are preserved
 
-3. **保存**
-   - 「保存」ボタンをクリック
-   - 「Translation updated successfully」と表示されれば完了
+3. **Save**
+   - Click the "Save" button
+   - You'll see "Translation updated successfully" when complete
 
-4. **ページを更新**
-   - ブラウザの更新ボタン（F5キー）を押す
-   - 修正した翻訳が表示されます
+4. **Refresh the page**
+   - Press the browser refresh button (F5 key)
+   - Your corrected translation will appear
 
-### 3. 編集モードを終了する
+### 3. Exit Edit Mode
 
-- 管理バーの「✏️ 翻訳を編集」を再度クリック
-- または URLから `?edit_translation=1` を削除
+- Click "✏️ Edit Translation" in the admin bar again
+- Or remove `?edit_translation=1` from the URL
 
-## 使用例
+## Usage Examples
 
-### 例1: ボタンの文言を変更
+### Example 1: Change Button Text
 
-**元の翻訳（AI）**: "今すぐ購入"
-**修正後**: "ご購入はこちら"
+**Original (AI)**: "Buy Now"
+**Corrected**: "Shop Now"
 
-1. `?edit_translation=1` をURLに追加
-2. "今すぐ購入" ボタンをクリック
-3. "ご購入はこちら" と入力
-4. 保存してページ更新
+1. Add `?edit_translation=1` to the URL
+2. Click the "Buy Now" button text
+3. Type "Shop Now"
+4. Save and refresh the page
 
-### 例2: 会社名を修正
+### Example 2: Fix Company Name
 
-**元の翻訳（AI）**: "ライフジェンス株式会社"
-**修正後**: "Lifegence Corporation"（英語のまま残す）
+**Original (AI)**: "Lifegence株式会社" (translated to Japanese)
+**Corrected**: "Lifegence Corporation" (keep in English)
 
-1. 編集モードをオン
-2. 会社名の部分をクリック
-3. 正しい表記を入力
-4. 保存
+1. Turn on edit mode
+2. Click the company name
+3. Type the correct version
+4. Save
 
-### 例3: 専門用語を統一
+### Example 3: Standardize Technical Terms
 
-**元の翻訳（AI）**: "クラウドコンピューティング"
-**修正後**: "クラウド" （社内の呼び方に統一）
+**Original (AI)**: "Cloud Computing Platform"
+**Corrected**: "Cloud Platform" (your company's standard term)
 
-1. 編集モードをオン
-2. 用語をクリック
-3. 統一した用語を入力
-4. 保存
+1. Turn on edit mode
+2. Click the term
+3. Enter your standardized term
+4. Save
 
-## すべての翻訳をやり直す
+## Re-translate Everything
 
-AI翻訳の品質を改善した後、すべてのページを再翻訳したい場合：
+If you want to re-translate all pages after improving AI translation quality:
 
-1. **管理画面にログイン**
-2. **設定 → Lifegence AITranslator → キャッシュ** タブを開く
-3. **「キャッシュバージョンをインクリメント（再翻訳を強制）」** ボタンをクリック
-4. 確認して実行
+1. **Log in to WordPress admin**
+2. Go to **Settings → Lifegence AITranslator → Cache** tab
+3. Click **"Increment Cache Version (Force Re-translate)"** button
+4. Confirm and execute
 
-これにより、次回アクセス時にすべてのページが新しく翻訳されます。
+All pages will be re-translated on next visit.
 
-## よくある質問
+## Frequently Asked Questions
 
-### Q: 編集モードが表示されない
+### Q: Edit mode doesn't appear
 
-**A**: 管理者としてログインしているか確認してください。一般ユーザーには編集機能は表示されません。
+**A**: Make sure you're logged in as an administrator. Regular users cannot see the edit feature.
 
-### Q: 保存してもすぐに反映されない
+### Q: Changes don't appear immediately after saving
 
-**A**: ブラウザのキャッシュが原因です。以下を試してください：
-- ブラウザの更新（F5キー）
-- ハードリロード（Ctrl + F5 / Cmd + Shift + R）
-- ブラウザのキャッシュクリア
+**A**: Browser cache is the cause. Try these:
+- Browser refresh (F5 key)
+- Hard reload (Ctrl + F5 / Cmd + Shift + R)
+- Clear browser cache
 
-### Q: 編集した内容が元に戻った
+### Q: My edits reverted to the original
 
-**A**: キャッシュがクリアされた可能性があります。もう一度編集して保存してください。
+**A**: The cache may have been cleared. Edit and save again.
 
-### Q: たくさんの文章を一度に編集したい
+### Q: I want to edit many sentences at once
 
-**A**: 一文ずつの編集が基本ですが、大量に修正する場合は「キャッシュバージョンをインクリメント」で全体を再翻訳することをお勧めします。
+**A**: Edit one at a time is the standard method. For bulk changes, use "Increment Cache Version" to re-translate everything.
 
-## 注意事項
+## Notes
 
-### できること
-- ✅ 表示された文章の修正
-- ✅ 単語や表現の変更
-- ✅ 何度でも編集可能
-- ✅ HTML形式の維持
+### What You Can Do
+- ✅ Edit any displayed text
+- ✅ Change words or expressions
+- ✅ Edit as many times as needed
+- ✅ HTML formatting is preserved
 
-### できないこと
-- ❌ 画像の翻訳
-- ❌ メニュー項目の一部（テーマによる）
-- ❌ JavaScriptで生成される動的なテキスト
-- ❌ 他の言語への同時変更（各言語ごとに編集が必要）
+### What You Cannot Do
+- ❌ Translate images
+- ❌ Some menu items (depends on theme)
+- ❌ Dynamically generated JavaScript text
+- ❌ Change multiple languages at once (edit each language separately)
 
-## サポート
+## Support
 
-編集機能で問題が発生した場合：
+If you have problems with the edit feature:
 
-1. ブラウザのコンソールでエラーを確認（F12キーを押して「Console」タブ）
-2. WordPressのデバッグログを確認
-3. 問題が解決しない場合はサポートに連絡
+1. Check browser console for errors (press F12 and go to "Console" tab)
+2. Check WordPress debug log
+3. Contact support if the problem persists
 
 ---
 
-**ヒント**: 編集した内容は記録しておくことをお勧めします。大規模な変更の際に、どの箇所を修正したか把握しやすくなります。
+**Tip**: Keep a record of your edits. This makes it easier to track what you've changed during large-scale modifications.

@@ -236,7 +236,7 @@ If an AI translation doesn't sound right, you can edit it directly on your websi
 
 1. **Enable Edit Mode**
    - Log in as admin
-   - Click "✏️ 翻訳を編集" in the admin bar
+   - Click "✏️ Edit Translation" button in the admin bar
    - Or add `?edit_translation=1` to the URL
 
 2. **Click and Edit**
@@ -278,7 +278,7 @@ For detailed instructions with screenshots, see the [Translation Editing Guide](
 
 ### Correcting AI Translations
 If an AI translation is incorrect:
-1. Enable edit mode: Add `?edit_translation=1` to the URL or click "✏️ 翻訳を編集" in admin bar
+1. Enable edit mode: Add `?edit_translation=1` to the URL or click "✏️ Edit Translation" in admin bar
 2. Click the text you want to change
 3. Type your correction and save
 4. Refresh the page to see changes
