@@ -34,8 +34,9 @@ class LG_Gemini_Translation_Service extends LG_Abstract_Translation_Service {
      * @throws Exception If translation fails
      */
     protected function call_translation_api($text, $source_lang, $target_lang) {
-        $source_name = LG_AITranslator::$languages[$source_lang] ?? $source_lang;
-        $target_name = LG_AITranslator::$languages[$target_lang] ?? $target_lang;
+        $all_languages = LG_AITranslator::get_all_languages();
+        $source_name = $all_languages[$source_lang] ?? $source_lang;
+        $target_name = $all_languages[$target_lang] ?? $target_lang;
 
         // Build prompt
         $system_message = $this->build_system_message($source_name, $target_name);

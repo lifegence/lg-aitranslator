@@ -69,6 +69,96 @@ class LG_AITranslator {
     }
 
     /**
+     * Get all languages (preset + custom)
+     *
+     * @return array Associative array of language codes and names
+     */
+    public static function get_all_languages() {
+        $preset = self::$languages;
+        $custom = get_option('lg_aitranslator_custom_languages', array());
+
+        // Merge custom languages (custom can override preset)
+        return array_merge($preset, $custom);
+    }
+
+    /**
+     * Get custom languages only
+     *
+     * @return array Associative array of custom language codes and names
+     */
+    public static function get_custom_languages() {
+        return get_option('lg_aitranslator_custom_languages', array());
+    }
+
+    /**
+     * Check if a language is a preset language
+     *
+     * @param string $code Language code
+     * @return bool True if preset, false otherwise
+     */
+    public static function is_preset_language($code) {
+        return isset(self::$languages[$code]);
+    }
+
+    /**
+     * Validate language code format
+     *
+     * @param string $code Language code to validate
+     * @return bool True if valid, false otherwise
+     */
+    public static function validate_language_code($code) {
+        // Allow alphanumeric, hyphen, and underscore
+        // Examples: en, zh-CN, pt_BR
+        return preg_match('/^[a-zA-Z0-9_-]+$/', $code) === 1 && !empty($code);
+    }
+
+    /**
+     * Add a custom language
+     *
+     * @param string $code Language code
+     * @param string $name Language name
+     * @return bool True on success, false on failure
+     */
+    public static function add_custom_language($code, $name) {
+        // Validate inputs
+        if (!self::validate_language_code($code)) {
+            return false;
+        }
+
+        $name = sanitize_text_field($name);
+        if (empty(trim($name))) {
+            return false;
+        }
+
+        // Get existing custom languages
+        $custom = get_option('lg_aitranslator_custom_languages', array());
+
+        // Add new language
+        $custom[$code] = $name;
+
+        // Save
+        return update_option('lg_aitranslator_custom_languages', $custom);
+    }
+
+    /**
+     * Remove a custom language
+     *
+     * @param string $code Language code to remove
+     * @return bool True on success, false if not found
+     */
+    public static function remove_custom_language($code) {
+        $custom = get_option('lg_aitranslator_custom_languages', array());
+
+        if (!isset($custom[$code])) {
+            return false;
+        }
+
+        unset($custom[$code]);
+
+        return update_option('lg_aitranslator_custom_languages', $custom);
+    }
+
+    /**
      * Constructor
      */
     private function __construct() {

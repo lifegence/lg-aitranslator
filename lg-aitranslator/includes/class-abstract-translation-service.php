@@ -246,7 +246,7 @@ abstract class LG_Abstract_Translation_Service implements LG_Translation_Service
      * @return array
      */
     public function get_supported_languages() {
-        return array_keys(LG_AITranslator::$languages);
+        return array_keys(LG_AITranslator::get_all_languages());
     }
 
     /**

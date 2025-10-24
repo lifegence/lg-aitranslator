@@ -153,16 +153,17 @@ class LG_Language_Switcher_Widget extends WP_Widget {
      * Render dropdown switcher
      */
     private function render_dropdown($langs, $current, $show_flags, $show_native) {
+        $all_languages = LG_AITranslator::get_all_languages();
         ?>
         <div class="lg-lang-switcher lg-lang-dropdown">
             <select id="lg-lang-select" class="lg-lang-select">
                 <?php foreach ($langs as $code): ?>
-                    <?php if (isset(LG_AITranslator::$languages[$code])): ?>
+                    <?php if (isset($all_languages[$code])): ?>
                         <option value="<?php echo esc_attr($code); ?>" <?php selected($current, $code); ?>>
                             <?php if ($show_flags): ?>
                                 <?php echo esc_html($this->get_flag_emoji($code)); ?>
                             <?php endif; ?>
-                            <?php echo esc_html(LG_AITranslator::$languages[$code]); ?>
+                            <?php echo esc_html($all_languages[$code]); ?>
                         </option>
                     <?php endif; ?>
                 <?php endforeach; ?>
@@ -175,17 +176,18 @@ class LG_Language_Switcher_Widget extends WP_Widget {
      * Render list switcher
      */
     private function render_list($langs, $current, $show_flags, $show_native) {
+        $all_languages = LG_AITranslator::get_all_languages();
         ?>
         <div class="lg-lang-switcher lg-lang-list">
             <ul class="lg-lang-list">
                 <?php foreach ($langs as $code): ?>
-                    <?php if (isset(LG_AITranslator::$languages[$code])): ?>
+                    <?php if (isset($all_languages[$code])): ?>
                         <li class="<?php echo $current === $code ? 'active' : ''; ?>">
                             <a href="<?php echo esc_url($this->get_language_url($code)); ?>" data-lang="<?php echo esc_attr($code); ?>" class="lg-lang-link">
                                 <?php if ($show_flags): ?>
                                     <span class="lg-lang-flag"><?php echo esc_html($this->get_flag_emoji($code)); ?></span>
                                 <?php endif; ?>
-                                <span class="lg-lang-name"><?php echo esc_html(LG_AITranslator::$languages[$code]); ?></span>
+                                <span class="lg-lang-name"><?php echo esc_html($all_languages[$code]); ?></span>
                             </a>
                         </li>
                     <?php endif; ?>
@@ -199,13 +201,14 @@ class LG_Language_Switcher_Widget extends WP_Widget {
      * Render flags only
      */
     private function render_flags($langs, $current) {
+        $all_languages = LG_AITranslator::get_all_languages();
         ?>
         <div class="lg-lang-switcher lg-lang-flags">
             <?php foreach ($langs as $code): ?>
-                <?php if (isset(LG_AITranslator::$languages[$code])): ?>
+                <?php if (isset($all_languages[$code])): ?>
                     <a href="<?php echo esc_url($this->get_language_url($code)); ?>" data-lang="<?php echo esc_attr($code); ?>"
                         class="lg-lang-flag-link <?php echo $current === $code ? 'active' : ''; ?>"
-                        title="<?php echo esc_attr(LG_AITranslator::$languages[$code]); ?>">
+                        title="<?php echo esc_attr($all_languages[$code]); ?>">
                         <?php echo esc_html($this->get_flag_emoji($code)); ?>
                     </a>
                 <?php endif; ?>

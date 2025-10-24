@@ -100,7 +100,7 @@ class LG_AITranslator_Admin_Settings {
                 </th>
                 <td>
                     <select id="default_language" name="default_language" class="regular-text">
-                        <?php foreach (LG_AITranslator::$languages as $code => $name): ?>
+                        <?php foreach (LG_AITranslator::get_all_languages() as $code => $name): ?>
                             <option value="<?php echo esc_attr($code); ?>" <?php selected($settings['default_language'], $code); ?>>
                                 <?php echo esc_html($name); ?> (<?php echo esc_html($code); ?>)
                             </option>
@@ -119,7 +119,7 @@ class LG_AITranslator_Admin_Settings {
                         <legend class="screen-reader-text"><span><?php esc_html_e('Supported Languages', 'lg-aitranslator'); ?></span></legend>
                         <?php
                         $supported = $settings['supported_languages'] ?? array();
-                        foreach (LG_AITranslator::$languages as $code => $name):
+                        foreach (LG_AITranslator::get_all_languages() as $code => $name):
                         ?>
                             <label style="display: inline-block; width: 200px; margin-bottom: 5px;">
                                 <input type="checkbox" name="supported_languages[]" value="<?php echo esc_attr($code); ?>"
