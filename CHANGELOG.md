@@ -21,7 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial public release
 - Google Gemini API integration for AI-powered translations
 - OpenAI GPT API integration as alternative provider
-- Support for 20+ world languages
+- Support for 20+ preset world languages
+- **Custom language support** - Add unlimited languages via admin interface
+- **Dynamic language management** - JavaScript-powered UI for adding/removing custom languages
+- **Language code validation** - Input validation and duplicate prevention
 - Smart caching system with WordPress Transients backend
 - Redis cache backend support for high-traffic sites
 - Language switcher widget with multiple display styles
@@ -39,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling and logging
 - WordPress Plugin Check compliance
 - GPL v2 license
+- **Full test coverage** - 38 automated tests (22 backend + 16 UI)
 
 ### Security
 - Input sanitization for all user inputs
@@ -92,10 +96,13 @@ This is the first stable release of Lifegence AITranslator, bringing AI-powered 
 
 **Key Features:**
 - Dual AI provider support (Gemini and OpenAI)
+- 20+ preset languages + unlimited custom languages
+- Custom language management via admin interface
 - Smart caching reduces costs by up to 95%
 - Beautiful language switcher widget
 - Developer-friendly REST API
 - Comprehensive admin interface
+- Full test coverage (38 automated tests)
 
 **Why This Release:**
 - Proven stability through extensive testing

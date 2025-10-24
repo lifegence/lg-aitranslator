@@ -65,7 +65,31 @@ Developed by **Lifegence Corporation** (https://lifegence.com)
 
 6. Click **Save Settings**
 
-### Step 4: Add Language Switcher
+### Step 4: Add Custom Languages (Optional)
+
+If you need languages not in the preset list (English, Japanese, Chinese, Spanish, etc.):
+
+1. Go to **Settings → Lifegence AITranslator → General** tab
+2. Scroll to **Custom Languages** section
+3. Enter language code (e.g., `tl` for Tagalog, `ms` for Malay)
+4. Enter language name (e.g., `Tagalog`, `Malay`)
+5. Click **Add Custom Language**
+6. Repeat for additional languages
+7. Click **Save Settings**
+
+**Popular Custom Languages:**
+- Tagalog: `tl`
+- Filipino: `fil`
+- Malay: `ms`
+- Bengali: `bn`
+- Urdu: `ur`
+- Persian: `fa`
+- Hebrew: `he`
+- Greek: `el`
+
+Custom languages will appear in all language selectors alongside preset languages.
+
+### Step 5: Add Language Switcher
 
 #### Method 1: Widget (Easiest)
 1. Go to **Appearance → Widgets**
@@ -93,7 +117,7 @@ if (function_exists('lg_aitranslator')) {
 ?>
 ```
 
-### Step 5: Test Translation
+### Step 6: Test Translation
 
 1. Visit your website
 2. Select a different language from switcher
@@ -200,13 +224,15 @@ Then in plugin:
 - Port: 6379
 - Test Connection ✓
 
-### Custom Language Mapping
+### Custom Language Mapping (Legacy Method)
+
+**Note:** You can now add custom languages via admin interface (Settings → Lifegence AITranslator → General → Custom Languages). This programmatic method is provided for advanced use cases only.
 
 Add to your theme's `functions.php`:
 
 ```php
 add_filter('lg_aitrans_supported_languages', function($languages) {
-    // Add custom language
+    // Add custom language programmatically
     $languages['my'] = 'မြန်မာဘာသာ'; // Burmese
     return $languages;
 });

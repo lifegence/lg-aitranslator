@@ -25,13 +25,19 @@ AI-powered automatic translation plugin using Google Gemini and OpenAI GPT. Tran
 
 **Multilingual Support**
 
-Support for 20+ languages including:
+Support for 20+ preset languages including:
 
 * English, Japanese (日本語), Korean (한국어)
 * Chinese Simplified (简体中文), Chinese Traditional (繁體中文)
 * Spanish, French, German, Italian, Portuguese
 * Russian, Arabic, Hindi, Thai, Vietnamese, Indonesian
 * Turkish, Polish, Dutch, Swedish
+
+**Plus unlimited custom languages:**
+
+* Add any language not in the preset list via admin interface
+* Popular additions: Tagalog, Filipino, Malay, Bengali, Urdu, Persian, Hebrew, Greek, and more
+* Simple interface: just enter language code and name, click Add
 
 **Inline Translation Editor**
 
@@ -98,6 +104,10 @@ No, you only need one. Choose either Google Gemini API or OpenAI API based on yo
 = How much does it cost to use this plugin? =
 
 The plugin itself is free, but you'll need an API key from either Google Gemini or OpenAI. Google Gemini offers a free tier with 15 requests per minute. OpenAI charges per token usage (~$0.15 per 1M tokens with GPT-4o-mini).
+
+= Can I add languages not in the preset list? =
+
+Yes! Go to Settings → Lifegence AITranslator → General tab, scroll to the "Custom Languages" section. Enter the language code (e.g., `tl` for Tagalog) and name, click "Add Custom Language", then save settings. Custom languages will appear in all language selectors.
 
 = Can I edit translations manually? =
 
@@ -170,7 +180,8 @@ The plugin automatically skips:
 = 1.0.0 =
 * Initial release
 * Dual AI engine support (Google Gemini + OpenAI GPT)
-* Support for 20+ languages
+* Support for 20+ preset languages
+* Custom language support - add unlimited languages via admin interface
 * Inline translation editor with visual edit mode
 * Smart caching system with WordPress Transients
 * Cache version management for forced re-translation
@@ -182,6 +193,9 @@ The plugin automatically skips:
 * API key validation with test connection
 * Rate limit optimization with batch translation
 * Intelligent text filtering (skip URLs, emails, code)
+* Dynamic language management with JavaScript UI
+* Language code validation and duplicate prevention
+* Full test coverage (38 automated tests)
 
 == Upgrade Notice ==
 

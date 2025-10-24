@@ -10,6 +10,7 @@ Developed by **Lifegence Corporation** (https://lifegence.com)
 - **Multiple Providers**: Support for both Gemini and OpenAI with easy switching
 - **Smart Caching**: Reduces API costs by 80-95% with intelligent caching system
 - **20+ Languages**: Support for major world languages including Japanese, Chinese, Spanish, French, and more
+- **Custom Languages**: Add any language not in the preset list via admin interface
 - **Language Switcher Widget**: Beautiful, customizable language selector
 - **REST API**: Programmatic translation via WordPress REST API
 - **Shortcode Support**: Easy integration with `[lg-translator]` shortcode
@@ -46,6 +47,7 @@ Navigate to **Settings → Lifegence AITranslator** and configure:
 - **Enable Translation**: Turn on AI translation
 - **Default Language**: Your website's original language
 - **Supported Languages**: Select languages to enable
+- **Custom Languages**: Add custom languages (see below)
 
 #### Translation Engine Tab
 - **Provider**: Choose Gemini or OpenAI
@@ -129,6 +131,8 @@ $translated_html = $service->translate_html(
 
 ## Supported Languages
 
+### Preset Languages (20)
+
 - English (en)
 - 日本語 (ja)
 - 简体中文 (zh-CN)
@@ -149,6 +153,44 @@ $translated_html = $service->translate_html(
 - Polski (pl)
 - Nederlands (nl)
 - Svenska (sv)
+
+### Custom Languages
+
+You can add any language not in the preset list through the admin interface.
+
+**How to Add Custom Languages:**
+
+1. Go to **Settings → Lifegence AITranslator → General** tab
+2. Scroll to the **Custom Languages** section
+3. Enter the language code (e.g., `tl` for Tagalog, `ms` for Malay)
+4. Enter the language name (e.g., `Tagalog`, `Malay`)
+5. Click **Add Custom Language**
+6. Click **Save Settings** to apply changes
+
+**Popular Custom Language Examples:**
+
+- Tagalog (`tl`)
+- Filipino (`fil`)
+- Malay (`ms`)
+- Bengali (`bn`)
+- Punjabi (`pa`)
+- Urdu (`ur`)
+- Persian (`fa`)
+- Hebrew (`he`)
+- Greek (`el`)
+- Czech (`cs`)
+- Danish (`da`)
+- Finnish (`fi`)
+- Norwegian (`no`)
+- Hungarian (`hu`)
+- Romanian (`ro`)
+- Ukrainian (`uk`)
+
+**Language Code Format:**
+
+- Use standard ISO 639-1 codes (2 letters) or extended codes
+- Allowed characters: letters, numbers, hyphens, underscores
+- Examples: `en`, `ja`, `zh-CN`, `pt-BR`, `fil`
 
 ## Pricing Estimates
 
